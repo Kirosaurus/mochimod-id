@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Livewire\Auth\LoginPage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -18,4 +19,8 @@ Route::middleware('auth')->group(function () {
 
         return redirect()->route('login');
     })->name('logout');
+
+    Route::resource("/products", ProductController::class)
+        ->middleware('auth.basic')
+        ->except("create", "show", "edit");
 });
