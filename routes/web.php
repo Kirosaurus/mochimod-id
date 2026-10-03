@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Livewire\Auth\LoginPage;
 use Illuminate\Support\Facades\Auth;
@@ -23,4 +24,6 @@ Route::middleware('auth')->group(function () {
     Route::resource("/products", ProductController::class)
         ->middleware('auth.basic')
         ->except("create", "show", "edit");
+
+    Route::get('pos', [PosController::class, 'index']);
 });
