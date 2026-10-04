@@ -37,7 +37,7 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <h1 className="text-center text-[22px] font-bold text-[#273454] tracking-tight mb-6">
+                        <h1 className="text-center text-headline-4 font-bold text-accent tracking-tight mb-6">
                             Login
                         </h1>
 
@@ -49,14 +49,14 @@ export default function LoginPage() {
                             {({ errors, processing }) => (
                                 <>
                                     <div>
-                                        <label className="block text-[13px] font-semibold text-[#576885] mb-1.5">
+                                        <label className="block text-small font-semibold text-accent mb-1.5">
                                             Username
                                         </label>
 
                                         <div
                                             className={`relative flex items-center rounded-xl border ${
                                                 errors.username
-                                                    ? "border-rose-400 bg-rose-50/20"
+                                                    ? "border-warning bg-warning/5"
                                                     : "border-gray-200 bg-[#F8FAFC]"
                                             } hover:border-slate-300 focus-within:border-[#374272]`}
                                         >
@@ -92,7 +92,7 @@ export default function LoginPage() {
                                             />
                                         </div>
                                         {errors.username && (
-                                            <p className="text-[13px] text-(--warning)">
+                                            <p className="text-small text-warning">
                                                 {errors.username}
                                             </p>
                                         )}
@@ -100,12 +100,12 @@ export default function LoginPage() {
 
                                     <div>
                                         <div className="flex items-center justify-between mb-1.5">
-                                            <label className="text-[13px] font-semibold text-[#576885]">
+                                            <label className="text-small font-semibold text-accent">
                                                 Password
                                             </label>
                                         </div>
 
-                                        <div className={`relative flex items-center rounded-xl bg-[#F8FAFC] border ${errors.password ? "border-(--warning)" : "border-gray-200"} bg-rose-50/20 hover:border-slate-300 focus-within:!border-[#374272] focus-within:!bg-white focus-within:ring-4 focus-within:ring-[#374272]/10 transition-all duration-200 group`}>
+                                        <div className={`relative flex items-center rounded-xl bg-[#F8FAFC] border ${errors.password ? "border-warning bg-warning/5" : "border-gray-200"} hover:border-slate-300 focus-within:!border-[#374272] focus-within:!bg-white focus-within:ring-4 focus-within:ring-[#374272]/10 transition-all duration-200 group`}>
                                             <div className="absolute left-3.5 text-slate-400 group-focus-within:text-[#374272] pointer-events-none transition-colors duration-200">
                                                 <svg
                                                     className="w-[18px] h-[18px]"
@@ -129,7 +129,6 @@ export default function LoginPage() {
                                             </div>
 
                                             <div
-                                                x-data="{ showPassword: false }"
                                                 className="flex items-center"
                                             >
                                                 <input
@@ -195,7 +194,7 @@ export default function LoginPage() {
                                             </div>
                                         </div>
                                         {errors.password && (
-                                            <p className="text-[13px] text-(--warning)">
+                                            <p className="text-small text-warning">
                                                 {errors.password}
                                             </p>
                                         )}

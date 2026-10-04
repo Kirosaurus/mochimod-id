@@ -4,20 +4,31 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
-    --font-sans:
-        'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    /* ini fontnya */
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     
-    --accent-color-10: #3B43711A;
+    /* ini color pallete sesuai sama yang di Figma*/
+    --color-primary: #F3904F;
+    --color-secondary: #FFC3A0;
+    --color-accent: #3B4371;
+    --color-success : #047857;
+    --color-success-bg : #ECFDF5;
+    --color-warning : #F43F5E;
+    --color-warning-bg : #FFF1F2;
+    
+    /* override color gray punya kita sendiri sesuai sama Figma */
+    --color-gray-200 : #EEEEEE;
+    --color-gray-400 : #BDBDBD;
+    --color-gray-600 : #757575;
+    --color-gray-800 : #424242;
 
-    --primary : #F3904F;
-
-    --secondary : #FFC3A0;
-
-    --warning : #F43F5E;
-    --warning-background : #FFF1F2;
-
-    --gray-200 : #EEEEEE;
-    --gray-400 : #BDBDBD;
-    --gray-600 : #757575;
-    --gray-800 : #424242;
+    /* ini size font yang dipake sesuai yang di Figma */
+    --text-small: 13px;
+    --text-normal: 16px;
+    --text-headline-6: 16px;
+    --text-headline-5: 20px;
+    --text-headline-4: 24px;
+    --text-headline-3: 28px;
+    --text-headline-2: 32px;
+    --text-headline-1: 40px;
 }
