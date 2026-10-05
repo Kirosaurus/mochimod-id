@@ -1,6 +1,11 @@
+import {usePage} from "@inertiajs/react";
+
 export default function TopBar() {
+    const { url, component } = usePage();
+
     return (
         <>
+            {console.log(usePage().url)}
             <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30">
                 <div className="mx-auto px-[20px] h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -25,17 +30,17 @@ export default function TopBar() {
                             <div className="flex d-flex-col">
                                 <div>
                                     <a
-                                        href="#"
+                                        href="/pos"
                                         className="font-semibold hover:scale-"
                                     >
-                                        <button className="cursor-pointer hover:bg-[#EEEEEE] duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]">
+                                        <button className={`${usePage().url === '/pos' ? 'bg-accent text-white' : 'bg-white text-gray-600 hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             POS / Kasir
                                         </button>
                                     </a>
                                 </div>
                                 <div>
                                     <a
-                                        href="#"
+                                        href="/manajemen-stok"
                                         className="font-semibold hover:scale-"
                                     >
                                         <button className="cursor-pointer hover:bg-[#EEEEEE] duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]">
