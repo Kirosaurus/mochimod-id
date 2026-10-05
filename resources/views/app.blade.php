@@ -16,7 +16,7 @@
             <title>{{ config('app.name') }}</title>
         </x-inertia::head>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-[#FBF9F7]">
         <x-inertia::app />
     </body>
 </html>

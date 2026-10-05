@@ -17,12 +17,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     rel="stylesheet"
                 />
             </Head>
-            <body>
-                <main>
-                    <TopBar></TopBar>
-                    {children}
-                </main>
-            </body>
+            <main>
+                <TopBar></TopBar>
+                {children}
+            </main>
         </>
     );
 }
