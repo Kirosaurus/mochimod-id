@@ -9,6 +9,7 @@ use App\Http\Controllers\PosController;
 
 Route::inertia('/', 'welcome')->name('home');
 // Route::inertia('/manajemen-stok', 'manajemen-stok')->name('manajemen stok');
+
 Route::get('/login', [AuthController::class, 'show'])->name('Login');
 Route::post('/login', [AuthController::class, 'login']);
 

@@ -27,7 +27,7 @@ export default function TopBar() {
                                 MOCHI
                                 <span className="text-orange-500">MOD</span>
                             </span>
-                            <div className="flex d-flex-col">
+                            <div className="flex d-flex-col gap-[6px]">
                                 <div>
                                     <a
                                         href="/pos"
@@ -65,7 +65,7 @@ export default function TopBar() {
 
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-full bg-(--accent-color-10) text-white flex items-center justify-center font-bold text-xs shadow-xs hover:scale-110 duration-300 ease-in-out">
+                            <div className="w-9 h-9 rounded-full bg-accent/10 text-white flex items-center justify-center font-bold text-xs shadow-xs hover:scale-110 duration-300 ease-in-out cursor-pointer">
                                 <svg
                                     width="16px"
                                     height="16px"
@@ -83,10 +83,6 @@ export default function TopBar() {
                                         />
                                     </g>
                                 </svg>
-                            </div>
-                            <div className="hidden sm:block text-left">
-                                {/* <p className="text-xs font-bold text-slate-800 leading-none">{{ auth()->user()->name }}</p> */}
-                                {/* <p className="text-[11px] text-slate-500 font-medium">@<span>{{ auth()->user()->username ?? 'user' }}</span></p> */}
                             </div>
                         </div>
                     </div>

@@ -1,26 +1,26 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
     /* ini fontnya */
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
     /* ini color pallete sesuai sama yang di Figma*/
-    --color-primary: #F3904F;
-    --color-secondary: #FFC3A0;
-    --color-accent: #3B4371;
-    --color-success : #047857;
-    --color-success-bg : #ECFDF5;
-    --color-warning : #F43F5E;
-    --color-warning-bg : #FFF1F2;
-    
+    --color-primary: #f3904f;
+    --color-secondary: #ffc3a0;
+    --color-accent: #3b4371;
+    --color-success: #047857;
+    --color-success-bg: #ecfdf5;
+    --color-warning: #f43f5e;
+    --color-warning-bg: #fff1f2;
+
     /* override color gray punya kita sendiri sesuai sama Figma */
-    --color-gray-200 : #EEEEEE;
-    --color-gray-400 : #BDBDBD;
-    --color-gray-600 : #757575;
-    --color-gray-800 : #424242;
+    --color-gray-200: #eeeeee;
+    --color-gray-400: #bdbdbd;
+    --color-gray-600: #757575;
+    --color-gray-800: #424242;
 
     /* ini size font yang dipake sesuai yang di Figma */
     --text-small: 13px;
@@ -31,6 +31,16 @@
     --text-headline-3: 28px;
     --text-headline-2: 32px;
     --text-headline-1: 40px;
+}
 
-    
+@layer utilities {
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
 }
