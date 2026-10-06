@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StockManagementController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\SalesReportController;
 
 Route::inertia('/', 'welcome')->name('home');
 // Route::inertia('/manajemen-stok', 'manajemen-stok')->name('manajemen stok');
@@ -18,6 +19,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/manajemen-stok', [StockManagementController::class, 'show'])->name('Stock Management');
 
+    Route::get('/laporan-penjualan', [SalesReportController::class, 'show'])->name('Sales Report');
+    
     Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();

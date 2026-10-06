@@ -33,7 +33,7 @@ export default function TopBar() {
                                         href="/pos"
                                         className="font-semibold hover:scale-"
                                     >
-                                        <button className={`${usePage().url === '/pos' ? 'bg-accent text-white' : 'bg-white text-gray-600 hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
+                                        <button className={`${usePage().url === '/pos' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             POS / Kasir
                                         </button>
                                     </a>
@@ -43,17 +43,17 @@ export default function TopBar() {
                                         href="/manajemen-stok"
                                         className="font-semibold hover:scale-"
                                     >
-                                        <button className="cursor-pointer hover:bg-[#EEEEEE] duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]">
+                                        <button className={`${usePage().url === '/manajemen-stok' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             Kelola Stok
                                         </button>
                                     </a>
                                 </div>
                                 <div>
                                     <a
-                                        href="#"
+                                        href="/laporan-penjualan"
                                         className="font-semibold hover:scale-"
                                     >
-                                        <button className="cursor-pointer hover:bg-[#EEEEEE] duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]">
+                                        <button className={`${usePage().url === '/laporan-penjualan' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             Laporan Penjualan
                                         </button>
                                     </a>
