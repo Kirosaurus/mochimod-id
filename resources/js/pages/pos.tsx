@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import React from "react";
+import React, { useState } from "react";
 import AppLayout from "@/layouts/main-layout";
 import { useCart } from "./use-cart";
 import CartPanel from "./cart-panel";
@@ -10,8 +10,14 @@ interface props{
     products: Product[]
 }
 export default function Pos({ products }: props) {
+    const [search, setSearch] = useState('');
     const { items, subTotal, addItem, removeItem, setQuantity, clear } =
         useCart();
+
+    const filtered = products.filter(p => 
+        p.name.toLowerCase().includes(search.toLowerCase())
+        // p.category.name.toLowerCase().includes()
+    )
 
     return (
         <>
@@ -84,7 +90,8 @@ export default function Pos({ products }: props) {
                                 {/* Filter opsi kategori */}
                             </div>
                             <ProductGrid 
-                                products={}
+                                products={filtered}
+                                onAdd={addItem}
                             />
                         </div>
                         <div className="w-[395px] h-full p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
