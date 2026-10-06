@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,8 +16,11 @@ class PosController extends Controller
                             ->orderBy('name')
                             ->get();
 
+        $categories = Category::orderBy('name')->get();
+
         return Inertia::render('pos', [
-            'products' => $products
+            'products' => $products,
+            'categories' => $categories
         ]);
     }
 }

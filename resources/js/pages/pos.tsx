@@ -4,20 +4,27 @@ import AppLayout from "@/layouts/main-layout";
 import { useCart } from "./use-cart";
 import CartPanel from "./cart-panel";
 import ProductGrid from "./product-grid";
-import { CartItem, Product } from "@/types";
+import { CartItem, Category, Product } from "@/types";
 
-interface props{
-    products: Product[]
+interface props {
+    products: Product[];
+    categories: Category[];
 }
-export default function Pos({ products }: props) {
-    const [search, setSearch] = useState('');
+export default function Pos({ products, categories }: props) {
+    const [search, setSearch] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(
+        null,
+    );
     const { items, subTotal, addItem, removeItem, setQuantity, clear } =
         useCart();
 
-    const filtered = products.filter(p => 
-        p.name.toLowerCase().includes(search.toLowerCase())
-        // p.category.name.toLowerCase().includes()
-    )
+    const filtered = products.filter((p) => {
+        const matchesSearch = p.name
+            .toLowerCase()
+            .includes(search.toLowerCase());
+        const matchesCategory = selectedCategory === null || p.category.id;
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <>
@@ -53,8 +60,10 @@ export default function Pos({ products }: props) {
 
                                     <input
                                         type="text"
-                                        name="username"
-                                        id="username"
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
                                         placeholder="Cari Produk... (Nama Produk atau Kode Produk)"
                                         className="w-full bg-transparent py-[8px] pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
                                     />
@@ -77,22 +86,38 @@ export default function Pos({ products }: props) {
                                 </div>
                                 {/* Search bar dan toolbar lainnya */}
                             </div>
-                            <div className="flex flex-row gap-[8px] items-center">
-                                <div className="bg-accent font-bold text-small text-white px-[16px] py-[6px] rounded-[50px]">
-                                    <p className="">Semua Kategori</p>
-                                </div>
-                                <div className="bg-white font-bold text-small px-[16px] py-[6px] rounded-[50px] border border-gray-200 hover:border-accent hover:translate-y-[-2px] duration-300 ease-in-out cursor-pointer">
-                                    <p>Mochi</p>
-                                </div>
-                                <div className="bg-white font-bold text-small px-[16px] py-[6px] rounded-[50px] border border-gray-200 hover:border-accent hover:translate-y-[-2px] duration-300 ease-in-out cursor-pointer">
-                                    <p>Jus</p>
-                                </div>
-                                {/* Filter opsi kategori */}
+                            <div className="flex flex-row gap-[8px] items-center overflow-x-auto pb-1">
+                                {/* Tombol "Semua Kategori" */}
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedCategory(null)}
+                                    className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer ${
+                                        selectedCategory === null
+                                            ? "bg-accent text-white shadow-sm"
+                                            : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
+                                    }`}
+                                >
+                                    Semua Kategori
+                                </button>
+                                {/* Looping kategori dari database */}
+                                {categories.map((cat) => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() =>
+                                            setSelectedCategory(cat.id)
+                                        }
+                                        className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                                            selectedCategory === cat.id
+                                                ? "bg-accent text-white shadow-sm"
+                                                : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
+                                        }`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))}
                             </div>
-                            <ProductGrid 
-                                products={filtered}
-                                onAdd={addItem}
-                            />
+                            <ProductGrid products={filtered} onAdd={addItem} />
                         </div>
                         <div className="w-[395px] h-full p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
                             <CartPanel
