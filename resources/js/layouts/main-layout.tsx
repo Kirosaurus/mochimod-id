@@ -17,7 +17,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     rel="stylesheet"
                 />
             </Head>
-            <main>
+            <main className="flex h-screen flex-col overflow-hidden">
                 <TopBar></TopBar>
                 {children}
             </main>

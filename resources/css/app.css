@@ -13,8 +13,13 @@
     --color-accent: #3b4371;
     --color-success: #047857;
     --color-success-bg: #ecfdf5;
-    --color-warning: #f43f5e;
-    --color-warning-bg: #fff1f2;
+    --color-success-outline : #A7F3D0;
+    --color-warning: #92400E;
+    --color-warning-bg: #FFFBEB;
+    --color-warning-outline: #FDE68A;
+    --color-failed: #f43f5e;
+    --color-failed-bg: #fff1f2;
+    --color-failed-outline: #FECDD3;
 
     /* override color gray punya kita sendiri sesuai sama Figma */
     --color-gray-200: #eeeeee;

@@ -5,8 +5,7 @@ export default function TopBar() {
 
     return (
         <>
-            {console.log(usePage().url)}
-            <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+            <header className="sticky top-0 z-30 shrink-0 bg-white border-b border-slate-200/80">
                 <div className="mx-auto px-[20px] h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#FFA785] to-[#FF8462] flex items-center justify-center text-white shadow-sm shadow-orange-500/20">

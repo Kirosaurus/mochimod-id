@@ -12,10 +12,10 @@ export default function Pos() {
         <>
             <Head title="POS Order - Mochimod" />
 
-            <main>
-                <div className="w-full h-[90vh] p-[16px]">
-                    <div className="h-full flex d-flex-row gap-[16px]">
-                        <div className="flex flex-col w-full corner-[16px] gap-[12px] ">
+            <div className="w-full flex-1 min-h-0">
+                <div className="w-full h-full min-h-0 box-border p-[16px]">
+                    <div className="h-full min-h-0 flex flex-row gap-[16px]">
+                        <div className="flex flex-1 min-w-0 min-h-0 flex-col gap-[12px]">
                             <div className="w-full h-auto p-[8px] bg-white rounded-[12px] border border-gray-200 flex flex-row items-center gap-[10px]">
                                 <div
                                     className={`w-full relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#374272] bg-[#F8FAFC] duration-300 ease-in-out`}
@@ -78,7 +78,7 @@ export default function Pos() {
                                 </div>
                                 {/* Filter opsi kategori */}
                             </div>
-                            <div className="w-full overflow-x-auto no-scrollbar">
+                            <div className="w-full flex-1 min-h-0 overflow-auto no-scrollbar">
                                 <div className="grid grid-flow-row grid-cols-6 auto-rows-auto gap-4 p-[2px]">
                                     {/* Dummy Katalog Produk 1 */}
                                     <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
@@ -480,7 +480,7 @@ export default function Pos() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[395px] h-full p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
+                        <div className="w-[395px] h-full min-h-0 shrink-0 p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
                             <CartPanel
                                 items={items}
                                 subtotal={subTotal}
@@ -491,7 +491,7 @@ export default function Pos() {
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 }
