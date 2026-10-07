@@ -1,8 +1,51 @@
 import { Head } from "@inertiajs/react";
 import React from "react";
 import AppLayout from "@/layouts/main-layout";
+import { Product } from "@/types";
 
-export default function StockManagement() {
+interface props {
+    products: Product[];
+}
+
+export default function StockManagement({ products }: props) {
+    function setStatus(stock: number) {
+        if (stock === 0) {
+            return (
+                <div className="flex items-center justify-center bg-failed-bg px-[12px] py-[6px] rounded-[8px] text-failed font-semibold text-normal border border-failed-outline hover:scale-105 hover:border-failed duration-300 ease-in-out cursor-pointer">
+                    <p className="text-nowrap">Stok Habis</p>
+                </div>
+            );
+        }
+
+        if (stock < 10) {
+            return (
+                <div className="flex items-center justify-center bg-warning-bg px-[12px] py-[6px] rounded-[8px] text-warning font-semibold text-normal border border-warning-outline hover:scale-105 hover:border-warning duration-300 ease-in-out cursor-pointer">
+                    <p className="text-nowrap">Stok Menipis</p>
+                </div>
+            );
+        }
+
+        return (
+            <div
+                className={`flex items-center justify-center bg-success-bg px-[12px] py-[6px] rounded-[8px] text-success font-semibold text-normal border border-success-outline`}
+            >
+                <p className="text-nowrap ">Stok Aman</p>
+            </div>
+        );
+    }
+
+    function setStockStatus(stock: number){
+        if(stock === 0){
+            return <span className="font-extrabold text-normal text-failed">{stock} </span>
+        }
+
+        if(stock < 10){
+            return <span className="font-extrabold text-normal text-warning">{stock} </span>
+        }
+
+        return(<span className="font-extrabold text-normal text-success">{stock} </span>)
+    }
+
     return (
         <>
             <Head title="Manajemen Stok - Mochimod" />
@@ -84,24 +127,24 @@ export default function StockManagement() {
                             type="text"
                             name="username"
                             id="username"
-                            placeholder="Cari Produk... (Nama Produk atau Kode Produk)"
+                            placeholder="Cari Nama Produk..."
                             className="w-full bg-transparent py-[8px] pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
                         />
                     </div>
                     <div className="flex flex-row gap-[10px] items-center">
                         <div>
-                            <p>
-                                Semua Kategori
-                            </p>
+                            <p>Semua Kategori</p>
                         </div>
-                        <div className="w-[1px] h-[20px] border border-gray-400">
-
-                        </div>
+                        <div className="w-[1px] h-[20px] border border-gray-400"></div>
                         <div className="h-full flex flex-row gap-[6px]">
-                            <div className={`flex items-center px-[12px] bg-accent py-[6px] rounded-[8px] text-white font-semibold text-normal`}>
+                            <div
+                                className={`flex items-center px-[12px] bg-accent py-[6px] rounded-[8px] text-white font-semibold text-normal`}
+                            >
                                 <p className="text-nowrap ">Semua Status</p>
                             </div>
-                            <div className={`flex items-center bg-success-bg px-[12px] py-[6px] rounded-[8px] text-success font-semibold text-normal border border-success-outline hover:scale-105 hover:border-success duration-300 ease-in-out cursor-pointer`}>
+                            <div
+                                className={`flex items-center bg-success-bg px-[12px] py-[6px] rounded-[8px] text-success font-semibold text-normal border border-success-outline hover:scale-105 hover:border-success duration-300 ease-in-out cursor-pointer`}
+                            >
                                 <p className="text-nowrap ">Stok Aman</p>
                             </div>
                             <div className="flex items-center bg-warning-bg px-[12px] py-[6px] rounded-[8px] text-warning font-semibold text-normal border border-warning-outline hover:scale-105 hover:border-warning duration-300 ease-in-out cursor-pointer">
@@ -112,6 +155,115 @@ export default function StockManagement() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="w-full rounded-[16px] overflow-hidden border border-gray-400">
+                    <table className="w-full bg-white rounded-full text-center table-fixed">
+                        <thead>
+                            <tr className="bg-[#F8FAFC] text-gray-600">
+                                <th className="py-[24px]">Kode</th>
+                                <th className="text-left">Nama Produk</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((item) => (
+                                <tr className="bg-white">
+                                    <td className="py-[24px]">{item.id}</td>
+                                    <td className="py-[24px] text-left text-normal font-bold">
+                                        {item.name}
+                                    </td>
+                                    <td className="py-[24px] flex flex-row justify-center">
+                                        {item.category_id === 1 ? (
+                                            <div className="bg-gray-200 rounded-full w-auto py-[4px] px-[16px]">
+                                                <p className="text-accent">
+                                                    Mochi
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-primary/10 rounded-full w-auto py-[4px] px-[16px]">
+                                                <p className="text-primary">
+                                                    Jus
+                                                </p>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="py-[24px]">
+                                        Rp {item.price}
+                                    </td>
+                                    <td className="py-[24px] text-small">
+                                        {setStockStatus(item.stock)}
+                                        pcs
+                                    </td>
+                                    <td className="py-[24px] flex justify-center">
+                                        {setStatus(item.stock)}
+                                    </td>
+                                    <td className="py-[24px]">
+                                        <div className="flex w-full justify-center">
+                                            <button className="flex flex-row gap-[8px] hover:scale-110 duration-300 ease-in-out cursor-pointer hover:bg-gray-200 rounded-[8px] p-2">
+                                                <svg
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                >
+                                                    <path
+                                                        d="M17 3.00006C17.2626 2.73741 17.5744 2.52907 17.9176 2.38693C18.2608 2.24479 18.6286 2.17163 19 2.17163C19.3714 2.17163 19.7392 2.24479 20.0824 2.38693C20.4256 2.52907 20.7374 2.73741 21 3.00006C21.2626 3.2627 21.471 3.57451 21.6131 3.91767C21.7553 4.26083 21.8284 4.62862 21.8284 5.00006C21.8284 5.37149 21.7553 5.73929 21.6131 6.08245C21.471 6.42561 21.2626 6.73741 21 7.00006L7.5 20.5001L2 22.0001L3.5 16.5001L17 3.00006Z"
+                                                        stroke="black"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                </svg>
+                                                <p>Ubah</p>
+                                            </button>
+                                            <button className="flex flex-row gap-[8px] hover:scale-110 duration-300 ease-in-out cursor-pointer hover:bg-failed-bg rounded-[8px] p-2">
+                                                <svg
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                >
+                                                    <path
+                                                        d="M3 6H5H21"
+                                                        stroke="var(--color-failed)"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6"
+                                                        stroke="var(--color-failed)"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M10 11V17"
+                                                        stroke="var(--color-failed)"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                    <path
+                                                        d="M14 11V17"
+                                                        stroke="var(--color-failed)"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    />
+                                                </svg>
+                                                <p className="text-failed">Hapus</p>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </>

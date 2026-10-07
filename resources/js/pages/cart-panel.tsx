@@ -1,3 +1,4 @@
+import products from "@/routes/products";
 import { CartItem } from "@/types";
 
 interface cartItem {
@@ -28,9 +29,9 @@ export default function CartPanel({
                 {items.length > 0 && (
                     <button
                         onClick={onClear}
-                        className="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                        className="text-xs text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
                     >
-                        Clear all
+                        Hapus Pesanan
                     </button>
                 )}
             </div>
@@ -168,7 +169,7 @@ export default function CartPanel({
                                     {item.product.name}
                                 </p>
                                 <p className="text-xs text-slate-400">
-                                    {item.product.price} each
+                                    Rp {item.product.price} / item
                                 </p>
                             </div>
                             <input
@@ -186,7 +187,7 @@ export default function CartPanel({
                             />
                             <button
                                 onClick={() => onRemove(item.product.id)}
-                                className="p-1 hover:bg-slate-100 rounded"
+                                className="p-1 hover:bg-slate-100 rounded cursor-pointer"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +214,7 @@ export default function CartPanel({
                     <span>Rp {subtotal.toLocaleString("id-ID")}</span>
                 </div>
                 <button
-                    className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
+                    className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors cursor-pointer"
                     disabled={items.length === 0}
                     // onClick={onCheckout}
                 >

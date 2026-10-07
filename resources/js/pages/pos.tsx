@@ -10,6 +10,7 @@ interface props {
     products: Product[];
     categories: Category[];
 }
+
 export default function Pos({ products, categories }: props) {
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<number | null>(
@@ -64,7 +65,7 @@ export default function Pos({ products, categories }: props) {
                                         onChange={(e) =>
                                             setSearch(e.target.value)
                                         }
-                                        placeholder="Cari Produk... (Nama Produk atau Kode Produk)"
+                                        placeholder="Cari Nama Produk..."
                                         className="w-full bg-transparent py-[8px] pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
                                     />
                                 </div>
@@ -86,7 +87,7 @@ export default function Pos({ products, categories }: props) {
                                 </div>
                                 {/* Search bar dan toolbar lainnya */}
                             </div>
-                            <div className="flex flex-row gap-[8px] items-center overflow-x-auto pb-1">
+                            <div className="flex flex-row gap-[8px] items-center overflow-x-auto pb-1 py-[2px]">
                                 {/* Tombol "Semua Kategori" */}
                                 <button
                                     type="button"
