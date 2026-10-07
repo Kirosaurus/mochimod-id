@@ -1,12 +1,30 @@
 import { Head } from "@inertiajs/react";
-import React from "react";
+import React, { useState } from "react";
 import AppLayout from "@/layouts/main-layout";
 import { useCart } from "./use-cart";
 import CartPanel from "./cart-panel";
+import ProductGrid from "./product-grid";
+import { CartItem, Category, Product } from "@/types";
 
-export default function Pos() {
+interface props {
+    products: Product[];
+    categories: Category[];
+}
+export default function Pos({ products, categories }: props) {
+    const [search, setSearch] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(
+        null,
+    );
     const { items, subTotal, addItem, removeItem, setQuantity, clear } =
         useCart();
+
+    const filtered = products.filter((p) => {
+        const matchesSearch = p.name
+            .toLowerCase()
+            .includes(search.toLowerCase());
+        const matchesCategory = selectedCategory === null || p.category.id === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <>
@@ -42,8 +60,10 @@ export default function Pos() {
 
                                     <input
                                         type="text"
-                                        name="username"
-                                        id="username"
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
                                         placeholder="Cari Produk... (Nama Produk atau Kode Produk)"
                                         className="w-full bg-transparent py-[8px] pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
                                     />
@@ -66,419 +86,40 @@ export default function Pos() {
                                 </div>
                                 {/* Search bar dan toolbar lainnya */}
                             </div>
-                            <div className="flex flex-row gap-[8px] items-center">
-                                <div className="bg-accent font-bold text-small text-white px-[16px] py-[6px] rounded-[50px]">
-                                    <p className="">Semua Kategori</p>
-                                </div>
-                                <div className="bg-white font-bold text-small px-[16px] py-[6px] rounded-[50px] border border-gray-200 hover:border-accent hover:translate-y-[-2px] duration-300 ease-in-out cursor-pointer">
-                                    <p>Mochi</p>
-                                </div>
-                                <div className="bg-white font-bold text-small px-[16px] py-[6px] rounded-[50px] border border-gray-200 hover:border-accent hover:translate-y-[-2px] duration-300 ease-in-out cursor-pointer">
-                                    <p>Jus</p>
-                                </div>
-                                {/* Filter opsi kategori */}
+                            <div className="flex flex-row gap-[8px] items-center overflow-x-auto pb-1">
+                                {/* Tombol "Semua Kategori" */}
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedCategory(null)}
+                                    className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer ${
+                                        selectedCategory === null
+                                            ? "bg-accent text-white shadow-sm"
+                                            : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
+                                    }`}
+                                >
+                                    Semua Kategori
+                                </button>
+                                {/* Looping kategori dari database */}
+                                {
+                                categories.map((cat) => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() =>
+                                            setSelectedCategory(cat.id)
+                                        }
+                                        className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                                            selectedCategory === cat.id
+                                                ? "bg-accent text-white shadow-sm"
+                                                : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
+                                        }`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))
+                                }
                             </div>
-                            <div className="w-full flex-1 min-h-0 overflow-auto no-scrollbar">
-                                <div className="grid grid-flow-row grid-cols-6 auto-rows-auto gap-4 p-[2px]">
-                                    {/* Dummy Katalog Produk 1 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Daifuku Stroberi Coklat
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 1 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Daifuku Anggur Coklat
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 2 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Milo
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 3 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Choco Crunchy
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 4 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Tiramisu
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 5 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Red Velvet
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 6 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Dubai Pistachio
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 20.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 7 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Dubai Pistachio Coklat
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 22.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 8 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Marshmallow
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 9 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Mochi Matcha
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Dummy Katalog Produk 10 */}
-                                    <div className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out">
-                                        <div className="flex flex-col gap-[4px]">
-                                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                                            <div className="flex flex-row w-fill items-center justify-between">
-                                                <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
-                                                    <p className="text-success font-bold text-small">
-                                                        Stok: 24 pcs
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-small text-gray-600">
-                                                        #DF-01
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="h-[75px]">
-                                                <p className="font-bold text-normal">
-                                                    Daifuku Mango Cream
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                                            <div className="flex flex-row gap-[14px] justify-between">
-                                                <div className="flex flex-col">
-                                                    <p className="text-small">
-                                                        Harga
-                                                    </p>
-                                                    <p className="text-normal font-bold text-nowrap">
-                                                        Rp 8.000
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Ini buat list produk */}
-                                </div>
-                            </div>
+                            <ProductGrid products={filtered} onAdd={addItem} />
                         </div>
                         <div className="w-[395px] h-full min-h-0 shrink-0 p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
                             <CartPanel
