@@ -33,28 +33,23 @@ export default function ProductGrid({ products, onAdd }: props) {
                             <div className="flex flex-row w-fill items-center justify-between">
                                 <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
                                     <p className="text-success font-bold text-small">
-                                        Stok: 24 pcs
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="font-bold text-small text-gray-600">
-                                        #DF-01
+                                        Stok : {product.stock}
                                     </p>
                                 </div>
                             </div>
-                            <div className="h-[75px]">
+                            <div className="flex h-[75px]">
                                 <p className="font-bold text-normal">
-                                    Daifuku Stroberi Coklat
+                                    {product.name}
                                 </p>
                             </div>
                         </div>
                         <div>
                             <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
                             <div className="flex flex-row gap-[14px] justify-between">
-                                <div className="flex flex-col">
+                                <div className="flex flex-col text-left">
                                     <p className="text-small">Harga</p>
                                     <p className="text-normal font-bold text-nowrap">
-                                        Rp 8.000
+                                        Rp {product.price}
                                     </p>
                                 </div>
                             </div>

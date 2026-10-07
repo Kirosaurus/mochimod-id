@@ -34,9 +34,11 @@ export default function CartPanel({
                     </button>
                 )}
             </div>
-            <div className="flex-1 overflow-y-auto py-4 space-y-3 p-2 content-center">
+            <div className="flex-1 overflow-y-auto py-4 space-y-3 p-2 content-start">
                 {items.length === 0 ? (
                     <>
+                    <div className="flex h-full flex-col items-center justify-center">
+
                         <div>
                             <svg
                                 width="240"
@@ -153,6 +155,7 @@ export default function CartPanel({
                         <p className="text-sm text-slate-400 text-center py-8">
                             Belum ada produk yang ditambahkan
                         </p>
+                    </div>
                     </>
                 ) : (
                     items.map((item) => (
