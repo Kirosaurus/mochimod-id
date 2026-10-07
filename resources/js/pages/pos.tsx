@@ -22,7 +22,7 @@ export default function Pos({ products, categories }: props) {
         const matchesSearch = p.name
             .toLowerCase()
             .includes(search.toLowerCase());
-        const matchesCategory = selectedCategory === null || p.category.id;
+        const matchesCategory = selectedCategory === null || p.category.id === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -100,7 +100,8 @@ export default function Pos({ products, categories }: props) {
                                     Semua Kategori
                                 </button>
                                 {/* Looping kategori dari database */}
-                                {categories.map((cat) => (
+                                {
+                                categories.map((cat) => (
                                     <button
                                         key={cat.id}
                                         type="button"
@@ -115,7 +116,8 @@ export default function Pos({ products, categories }: props) {
                                     >
                                         {cat.name}
                                     </button>
-                                ))}
+                                ))
+                                }
                             </div>
                             <ProductGrid products={filtered} onAdd={addItem} />
                         </div>

@@ -14,7 +14,7 @@ export default function ProductGrid({ products, onAdd }: props) {
     if (products.length === 0) {
         return (
             <div className="flex flex-1 items-center justify-center text-muted-foreground">
-                No Product Found
+                Tidak ada produk yang tersedia
             </div>
         );
     }
