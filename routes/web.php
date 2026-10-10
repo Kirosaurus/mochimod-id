@@ -8,13 +8,12 @@ use App\Http\Controllers\StockManagementController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\SalesReportController;
 
-Route::inertia('/', 'welcome')->name('home');
-// Route::inertia('/manajemen-stok', 'manajemen-stok')->name('manajemen stok');
-
 Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth')->group(function () {
+    Route::get('/', [PosController::class, 'login']);
+    
     Route::get('/pos', [PosController::class, 'show'])->name('POS');
 
     Route::get('/manajemen-stok', [StockManagementController::class, 'show'])->name('Stock Management');

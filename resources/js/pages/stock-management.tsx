@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import React from "react";
+import React, { useState } from "react";
 import AppLayout from "@/layouts/main-layout";
 import { Product } from "@/types";
 
@@ -8,8 +8,13 @@ interface props {
 }
 
 export default function StockManagement({ products }: props) {
+    let [habis, setHabis] = useState(0);
+    let [menipis, setMenipis] = useState(0);
+    let [aman, setAman] = useState(0);
+
     function setStatus(stock: number) {
         if (stock === 0) {
+            setHabis((prev) => prev + 1);
             return (
                 <div className="flex items-center justify-center bg-failed-bg px-[12px] py-[6px] rounded-[8px] text-failed font-semibold text-normal border border-failed-outline hover:scale-105 hover:border-failed duration-300 ease-in-out cursor-pointer">
                     <p className="text-nowrap">Stok Habis</p>
@@ -18,6 +23,7 @@ export default function StockManagement({ products }: props) {
         }
 
         if (stock < 10) {
+            setMenipis((prev) => prev + 1);
             return (
                 <div className="flex items-center justify-center bg-warning-bg px-[12px] py-[6px] rounded-[8px] text-warning font-semibold text-normal border border-warning-outline hover:scale-105 hover:border-warning duration-300 ease-in-out cursor-pointer">
                     <p className="text-nowrap">Stok Menipis</p>
@@ -25,6 +31,7 @@ export default function StockManagement({ products }: props) {
             );
         }
 
+        setAman((prev) => prev + 1);
         return (
             <div
                 className={`flex items-center justify-center bg-success-bg px-[12px] py-[6px] rounded-[8px] text-success font-semibold text-normal border border-success-outline`}
@@ -34,16 +41,28 @@ export default function StockManagement({ products }: props) {
         );
     }
 
-    function setStockStatus(stock: number){
-        if(stock === 0){
-            return <span className="font-extrabold text-normal text-failed">{stock} </span>
+    function setStockStatus(stock: number) {
+        if (stock === 0) {
+            return (
+                <span className="font-extrabold text-normal text-failed">
+                    {stock}{" "}
+                </span>
+            );
         }
 
-        if(stock < 10){
-            return <span className="font-extrabold text-normal text-warning">{stock} </span>
+        if (stock < 10) {
+            return (
+                <span className="font-extrabold text-normal text-warning">
+                    {stock}{" "}
+                </span>
+            );
         }
 
-        return(<span className="font-extrabold text-normal text-success">{stock} </span>)
+        return (
+            <span className="font-extrabold text-normal text-success">
+                {stock}{" "}
+            </span>
+        );
     }
 
     return (
@@ -81,7 +100,7 @@ export default function StockManagement({ products }: props) {
                             </svg>
                             <p>Export CSV / Laporan Stok</p>
                         </div>
-                        <div className="flex flex-row bg-accent text-white rounded-[12px] px-[16px] py-[10px] border border-gray-400 text-semibold text-normal gap-[8px] hover:scale-105 hover:shadow-[0px_0px_30px_-10px_var(--color-accent)] duration-300 ease-in-out cursor-pointer">
+                        <div className="flex flex-row bg-accent text-white rounded-[12px] px-[16px] py-[10px] border border-gray-400 text-semibold text-normal gap-[8px] hover:scale-105 hover:shadow-[0px_0px_30px_-10px_var(--color-accent)] duration-300 ease-in-out cursor-pointer active:scale-100">
                             <svg
                                 width="24px"
                                 height="24px"
@@ -132,8 +151,24 @@ export default function StockManagement({ products }: props) {
                         />
                     </div>
                     <div className="flex flex-row gap-[10px] items-center">
-                        <div>
+                        <div className="px-[16px] py-[8px] bg-gray-200 rounded-[8px] text-accent font-bold flex flex-row items-center gap-[8px] cursor-pointer hover:bg-gray-400 duration-300 ease-in-out">
                             <p>Semua Kategori</p>
+                            <svg
+                                width="20px"
+                                height="20px"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M19.9201 8.94995L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.94995"
+                                    stroke="#292D32"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
                         </div>
                         <div className="w-[1px] h-[20px] border border-gray-400"></div>
                         <div className="h-full flex flex-row gap-[6px]">
@@ -256,13 +291,93 @@ export default function StockManagement({ products }: props) {
                                                         stroke-linejoin="round"
                                                     />
                                                 </svg>
-                                                <p className="text-failed">Hapus</p>
+                                                <p className="text-failed">
+                                                    Hapus
+                                                </p>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td
+                                    className="px-[16px] py-[14px] font-bold bg-[#F8FAFC] text-left"
+                                    colSpan={7}
+                                >
+                                    <div className="w-full flex flex-row items-center content-between">
+                                        <div className="w-full flex flex-row gap-[16px]">
+                                            Total {products.length} Produk
+                                            Terdaftar
+                                            <span className="flex flex-row text-warning items-center gap-[4px]">
+                                                <svg
+                                                    width="8px"
+                                                    height="8px"
+                                                    viewBox="0 0 16 16"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="var(--color-warning)"
+                                                    className="absolute inline-flex animate-ping"
+                                                >
+                                                    <circle
+                                                        cx="8"
+                                                        cy="8"
+                                                        r="8"
+                                                    />
+                                                </svg>
+                                                <svg
+                                                    width="8px"
+                                                    height="8px"
+                                                    viewBox="0 0 16 16"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="var(--color-warning)"
+                                                >
+                                                    <circle
+                                                        cx="8"
+                                                        cy="8"
+                                                        r="8"
+                                                    />
+                                                </svg>
+                                                {menipis} Menipis
+                                            </span>
+                                            <span className="flex flex-row text-failed items-center gap-[4px]">
+                                                <svg
+                                                    width="8px"
+                                                    height="8px"
+                                                    viewBox="0 0 16 16"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="var(--color-failed)"
+                                                    className="absolute inline-flex animate-ping"
+                                                >
+                                                    <circle
+                                                        cx="8"
+                                                        cy="8"
+                                                        r="8"
+                                                    />
+                                                </svg>
+                                                <svg
+                                                    width="8px"
+                                                    height="8px"
+                                                    viewBox="0 0 16 16"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="var(--color-failed)"
+                                                >
+                                                    <circle
+                                                        cx="8"
+                                                        cy="8"
+                                                        r="8"
+                                                    />
+                                                </svg>
+                                                {habis} Habis
+                                            </span>
+                                        </div>
+                                        <div className="text-nowrap">
+                                            <p>Halaman 1 dari 3</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

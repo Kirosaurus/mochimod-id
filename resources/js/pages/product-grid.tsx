@@ -26,7 +26,7 @@ export default function ProductGrid({ products, onAdd }: props) {
                     <button 
                         key={product.id}
                         onClick={() => onAdd(product)}
-                        className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out"
+                        className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out active:translate-y-[2px]"
                     >
                         <div className="flex flex-col gap-[4px]">
                             <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
