@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 10, 2)->nullable();
             $table->decimal('change_amount', 10, 2)->nullable();
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
-            $table->text('note')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
