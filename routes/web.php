@@ -15,12 +15,16 @@ Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth')->group(function () {
+    // Route for Point of Sales
     Route::get('/pos', [PosController::class, 'show'])->name('POS');
 
+    // Route for Stock Management
     Route::get('/manajemen-stok', [StockManagementController::class, 'show'])->name('Stock Management');
 
+    // Route for Sale Report
     Route::get('/laporan-penjualan', [SalesReportController::class, 'show'])->name('Sales Report');
     
+    // Route for Logout
     Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();
@@ -29,7 +33,15 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('login');
     })->name('logout');
 
+    // Route for Product
     Route::resource("/products", ProductController::class)
         ->middleware('auth.basic')
         ->except("create", "show", "edit");
+
+    // Route for Checkout
+    Route::post('checkout/confirm', [CheckoutController::class, 'checkout.confirm'])
+        ->name('confirm');
+
+    Route::get('checkout/{id}/receipt', [CheckoutController::class, 'checkout.receipt'])
+        ->name('receipt');
 });
