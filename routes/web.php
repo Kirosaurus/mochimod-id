@@ -40,9 +40,9 @@ Route::middleware('auth')->group(function () {
         ->except("create", "show", "edit");
 
     // Route for Checkout
-    Route::post('checkout/confirm', [CheckoutController::class, 'checkout.confirm'])
+    Route::post('checkout/confirm', [CheckoutController::class, 'confirm'])
         ->name('confirm');
 
-    Route::get('checkout/{id}/receipt', [CheckoutController::class, 'checkout.receipt'])
+    Route::get('checkout/{id}/receipt', [CheckoutController::class, 'receipt'])
         ->name('receipt');
 });

@@ -42,9 +42,21 @@ class Transaction extends Model
     }
 
     // Generate Code
-    public function generateCode()
+    public static function generateCode(): string
     {
-        // later
+        $prefix = 'TRX-' . date('Ymd') . '-';
+        $lastTransaction = self::where('transaction_code', 'like', $prefix . '%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+        if ($lastTransaction) {
+            $lastCode = $lastTransaction->transaction_code;
+            $lastNumber = (int) substr($lastCode, strrpos($lastCode, '-') + 1);
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
 }
