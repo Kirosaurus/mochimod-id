@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('transaction_code', 20)->unique();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->enum('payment_method', ['cash', 'qris']);
-            $table->decimal('total_amount', 10, 2);
-            $table->decimal('amount_paid', 10, 2)->nullable();
-            $table->decimal('change_amount', 10, 2)->nullable();
+            $table->decimal('total_amount', 12, 2);
+            $table->decimal('amount_paid', 12, 2)->nullable();
+            $table->decimal('change_amount', 12, 2)->nullable();
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();

@@ -40,14 +40,14 @@ class CheckoutController extends Controller
             // Cek produk aktif
             if (!$product->is_active) {
                 throw ValidationException::withMessages([
-                    'items' => "Produk '{$product->name}' sedang tidak aktif.",
+                    'items' => "Produk '{$product->name}' sedang tidak tersedia.",
                 ]);
             }
 
             // Cek stok produk
             if ($product->stock < $item['quantity']) {
                 throw ValidationException::withMessages([
-                    'items' => "Stok '{$product->name}' tidak mencukupi (Tersedia: {$product->stock}).",
+                    'items' => "Stok '{$product->name}' tidak mencukupi. Tersedia: {$product->stock}.",
                 ]);
             }
 
@@ -62,7 +62,7 @@ class CheckoutController extends Controller
         if ($validated['payment_method'] === 'cash') {
             if ($validated['amount_paid'] < $totalAmount) {
                 throw ValidationException::withMessages([
-                    'amount_paid' => 'Uang yang dibayarkan tidak mencukupi.',
+                    'amount_paid' => 'Jumlah uang yang diterima kurang dari total tagihan.',
                 ]);
             }
             $changeAmount = $validated['amount_paid'] - $totalAmount;
@@ -112,19 +112,18 @@ class CheckoutController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
+                'success'     => true,
                 'message'     => 'Transaksi berhasil disimpan.',
                 'transaction' => $transaction->load('items'),
             ], 201);
         }
 
-        return redirect()->route('receipt', $transaction->id);
+        return redirect()->route('checkout.receipt', $transaction);
     }
 
-    public function receipt($id)
+    public function receipt(Transaction $transaction)
     {
-        $transaction = Transaction::with(['items', 'user'])->findOrFail($id);
-
-        return Inertia::render('checkout/receipt', [
+        return Inertia::render('receipt', [
             'transaction' => $transaction->load('items'),
         ]);
     }

@@ -29,4 +29,19 @@ class CheckoutRequest extends FormRequest
             'amount_paid'        => ['required_if:payment_method,cash', 'numeric', 'min:0']
         ];
     }
+
+    /**
+     * Get custom error messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'items.required'            => 'Keranjang belanja tidak boleh kosong.',
+            'items.min'                 => 'Minimal harus ada 1 item.',
+            'items.*.product_id.exists' => 'Produk tidak ditemukan atau sudah tidak aktif.',
+            'amount_paid.required_if'   => 'Jumlah uang yang diterima wajib diisi untuk pembayaran tunai.',
+        ];
+    }
 }
