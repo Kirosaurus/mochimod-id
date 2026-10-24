@@ -43,5 +43,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('checkout')->name('checkout.')->group(function () {
         Route::post('/confirm', [CheckoutController::class, 'confirm'])->name('confirm');
         Route::get('/{transaction}/receipt', [CheckoutController::class, 'receipt'])->name('receipt');
+        Route::get('{transaction}/receipt/pdf', [CheckoutController::class, 'donwloadPdf'])->name('receipt.pdf');
     });
 });
