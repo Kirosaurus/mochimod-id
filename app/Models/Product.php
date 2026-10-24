@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Override;
 
 #[Fillable(
-    "category_id",
-    "name",
-    "stock",
-    "price",
-    "image",
-    "is_active"
+    'category_id',
+    'name',
+    'stock',
+    'price',
+    'image',
+    'is_active'
 )]
 class Product extends Model
 {

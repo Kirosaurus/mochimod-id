@@ -7,6 +7,7 @@ interface cartItem {
 interface props {
     items: cartItem[];
     subtotal: number;
+    onCheckout: () => void;
     onRemove: (productId: number) => void;
     onSetQuantity: (productId: number, qty: number) => void;
     onClear: () => void;
@@ -15,6 +16,7 @@ interface props {
 export default function CartPanel({
     items,
     subtotal,
+    onCheckout,
     onRemove,
     onSetQuantity,
     onClear,
@@ -208,18 +210,20 @@ export default function CartPanel({
                 )}
             </div>
             <div className="space-y-3 border-t border-gray-400 pt-4">
-                <div className="flex justify-between text-base font-bold text-slate-800">
-                    <span>Total</span>
-                    <span>Rp {subtotal.toLocaleString("id-ID")}</span>
-                </div>
-                <button
-                    className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
-                    disabled={items.length === 0}
-                    // onClick={onCheckout}
-                >
-                    Konfirmasi Pembayaran
-                </button>
-            </div>
+    <div className="flex justify-between text-base font-bold text-slate-800">
+        <span>Total</span>
+        <span>Rp {subtotal.toLocaleString("id-ID")}</span>
+    </div>
+
+    <button
+        type="button"
+        className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
+        disabled={items.length === 0}
+        onClick={onCheckout}
+    >
+        Konfirmasi Pembayaran
+    </button>
+</div>
         </div>
     );
 }

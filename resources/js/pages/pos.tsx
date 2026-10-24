@@ -5,6 +5,7 @@ import { useCart } from "./use-cart";
 import CartPanel from "./cart-panel";
 import ProductGrid from "./product-grid";
 import { CartItem, Category, Product } from "@/types";
+import Checkout from "./checkout";
 
 interface props {
     products: Product[];
@@ -12,9 +13,12 @@ interface props {
 }
 export default function Pos({ products, categories }: props) {
     const [search, setSearch] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(
-        null,
-    );
+    const [selectedCategory, setSelectedCategory] =
+        useState<number | null>(null);
+
+    const [isCheckoutOpen, setIsCheckoutOpen] =
+        useState(false);
+
     const { items, subTotal, addItem, removeItem, setQuantity, clear } =
         useCart();
 
@@ -127,12 +131,24 @@ export default function Pos({ products, categories }: props) {
                                 subtotal={subTotal}
                                 onRemove={removeItem}
                                 onSetQuantity={setQuantity}
+                                onCheckout={() => setIsCheckoutOpen(true)}
                                 onClear={clear}
                             />
                         </div>
                     </div>
                 </div>
             </main>
+            {isCheckoutOpen && (
+    <Checkout
+        items={items}
+        subtotal={subTotal}
+        onClose={() => setIsCheckoutOpen(false)}
+        onSuccess={() => {
+            clear();
+            setIsCheckoutOpen(false);
+        }}
+    />
+)}
         </>
     );
 }
