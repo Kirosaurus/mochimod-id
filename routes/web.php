@@ -10,7 +10,7 @@ use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
-    if (auth()->check()) {
+    if (Auth::check()) {
         return redirect()->route('POS');
     }
 
