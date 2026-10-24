@@ -136,14 +136,14 @@ class CheckoutController extends Controller
 
         $pdf = FacadePdf::loadView('receipts.pdf', [
             'transaction'  => $transaction,
-            'storeName'    => config('app.store_name', 'Mochimod'),
-            'storeAddress' => config('app.store_address', ''),
-            'storePhone'   => config('app.store_phone', '')
+            'store_name'    => env('STORE_NAME', 'Mochimod'),
+            'store_address' => env('STORE_ADDRESS', ''),
+            'store_phone'   => env('STORE_PHONE', ''),
         ]);
 
         $pdf->setPaper('A5', 'portrait');
 
-        $filename = 'nota-' + $transaction->transaction_code + '.pdf';
+        $filename = 'nota-' . $transaction->transaction_code . '.pdf';
 
         return $pdf->download($filename);
     }
