@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -124,7 +126,25 @@ class CheckoutController extends Controller
     public function receipt(Transaction $transaction)
     {
         return Inertia::render('receipt', [
-            'transaction' => $transaction->load('items'),
+            'transaction' => $transaction->load(['items', 'user']),
         ]);
+    }
+
+    public function downloadPdf(Transaction $transaction)
+    {
+        $transaction->load(['items', 'user']);
+
+        $pdf = FacadePdf::loadView('receipts.pdf', [
+            'transaction'  => $transaction,
+            'storeName'    => config('app.store_name', 'Mochimod'),
+            'storeAddress' => config('app.store_address', ''),
+            'storePhone'   => config('app.store_phone', '')
+        ]);
+
+        $pdf->setPaper('A5', 'portrait');
+
+        $filename = 'nota-' + $transaction->transaction_code + '.pdf';
+
+        return $pdf->download($filename);
     }
 }
