@@ -30,10 +30,10 @@ export default function TopBar() {
                             <div className="flex d-flex-col gap-[6px]">
                                 <div>
                                     <a
-                                        href="/pos"
+                                        href="/"
                                         className="font-semibold hover:scale-"
                                     >
-                                        <button className={`${usePage().url === '/pos' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
+                                        <button className={`${usePage().url === '/' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             POS / Kasir
                                         </button>
                                     </a>

@@ -18,6 +18,7 @@ interface CheckoutForm {
         quantity: number;
     }[];
     payment_method: PaymentMethod;
+    amount_paid: number;
 }
 
 export default function Checkout({
@@ -38,6 +39,7 @@ export default function Checkout({
             quantity: item.quantity,
         })),
         payment_method: "cash",
+        amount_paid: 0,
     });
 
     function selectPaymentMethod(method: PaymentMethod) {
@@ -48,7 +50,8 @@ export default function Checkout({
     function submitCheckout(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        form.post("/orders", {
+        form.setData("amount_paid", paymentMethod === "cash" ? cashReceived : subtotal);
+        form.post("/checkout/confirm", {
             preserveScroll: true,
             onSuccess,
         });
