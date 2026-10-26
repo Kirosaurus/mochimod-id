@@ -102,6 +102,7 @@ class CheckoutController extends Controller
                     'product_id'    => $product->id,
                     'product_name'  => $product->name,
                     'product_price' => $product->price,
+                    'category_name' => $product->category->name,
                     'quantity'      => $item['quantity'],
                     'subtotal'      => $subtotalItem,
                 ]);
