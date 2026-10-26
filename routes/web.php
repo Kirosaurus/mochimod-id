@@ -45,4 +45,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/{transaction}/receipt', [CheckoutController::class, 'receipt'])->name('receipt');
         Route::get('/{transaction}/receipt/pdf', [CheckoutController::class, 'downloadPdf'])->name('receipt.pdf');
     });
+
+    // Route for Sales Report
+    Route::prefix('laporan-penjualan')->name('sales-report')->group(function() {
+        Route::get('/', [SalesReportController::class, 'show'])->name('index');
+        Route::get('/summary', [SalesReportController::class], 'summary')->name('summary');
+        Route::get('/chart', [SalesReportController::class, 'chart'])->name('chart');
+        Route::get('/history', [SalesReportController::class, 'history'])->name('history');
+        Route::get('/pdf', [SalesReportController::class, 'downloadPdf'])->name('pdf');
+    });
 });
