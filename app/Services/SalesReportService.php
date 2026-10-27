@@ -323,4 +323,45 @@ class SalesReportService
             ],
         ];
     }
+
+    /**
+     * Mengambil proporsi penjualan berdasarkan kategori produk.
+     *
+     * @param  string  $period  'daily' | 'weekly' | 'monthly'
+     */
+    public function getCategorySales(string $period, DateTimeInterface|string|null $date = null): array
+    {
+        [$startDate, $endDate] = $this->resolveDateRange($period, $date);
+
+        $rows = DB::table('transaction_items as ti')
+            ->join('transactions as t', 't.id', '=', 'ti.transaction_id')
+            ->where('t.status', 'completed')
+            ->whereBetween('t.created_at', [$startDate, $endDate])
+            ->whereNotNull('ti.category_name')
+            ->groupBy('ti.category_name')
+            ->orderByDesc('total_qty')
+            ->select([
+                'ti.category_name',
+                DB::raw('SUM(ti.quantity) as total_qty'),
+            ])
+            ->get();
+
+        $totalQty = (int) $rows->sum('total_qty');
+
+        $categories = $rows->map(function ($row) use ($totalQty) {
+            $qty = (int) $row->total_qty;
+            $percentage = $totalQty > 0 ? (int) round(($qty / $totalQty) * 100) : 0;
+
+            return [
+                'name' => $row->category_name,
+                'qty' => $qty,
+                'percentage' => $percentage,
+            ];
+        })->values()->all();
+
+        return [
+            'total_qty' => $totalQty,
+            'categories' => $categories,
+        ];
+    }
 }

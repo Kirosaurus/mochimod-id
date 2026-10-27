@@ -428,3 +428,141 @@ test('getChartData handles empty period with zero peak', function () {
             'value' => 0,
         ]);
 });
+
+test('getCategorySales returns empty structure when no sales exist', function () {
+    $result = $this->service->getCategorySales('daily', '2026-10-27');
+
+    expect($result)->toBe([
+        'total_qty' => 0,
+        'categories' => [],
+    ]);
+});
+
+test('getCategorySales calculates category quantities and percentages correctly', function () {
+    $user = User::factory()->create();
+
+    // Completed Transaction 1
+    $trx1 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-CAT-01',
+        'user_id' => $user->id,
+        'payment_method' => 'qris',
+        'total_amount' => 500000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 10:00:00',
+        'updated_at' => '2026-10-27 10:00:00',
+    ]);
+
+    // Completed Transaction 2
+    $trx2 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-CAT-02',
+        'user_id' => $user->id,
+        'payment_method' => 'cash',
+        'total_amount' => 400000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 15:00:00',
+        'updated_at' => '2026-10-27 15:00:00',
+    ]);
+
+    // Pending Transaction (must be ignored)
+    $trxPending = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-CAT-PENDING',
+        'user_id' => $user->id,
+        'payment_method' => 'cash',
+        'total_amount' => 100000,
+        'status' => 'pending',
+        'created_at' => '2026-10-27 16:00:00',
+        'updated_at' => '2026-10-27 16:00:00',
+    ]);
+
+    // Insert Items for Trx 1:
+    // Daifuku Buah Segar: 50
+    // Classic Traditional Mochi: 41
+    // Item with null category_name: 10 (should be excluded)
+    DB::table('transaction_items')->insert([
+        [
+            'transaction_id' => $trx1,
+            'product_name' => 'Ichigo Daifuku',
+            'category_name' => 'Daifuku Buah Segar',
+            'product_price' => 10000,
+            'quantity' => 50,
+            'subtotal' => 500000,
+            'created_at' => '2026-10-27 10:00:00',
+            'updated_at' => '2026-10-27 10:00:00',
+        ],
+        [
+            'transaction_id' => $trx1,
+            'product_name' => 'Mochi Wijen',
+            'category_name' => 'Classic Traditional Mochi',
+            'product_price' => 5000,
+            'quantity' => 41,
+            'subtotal' => 205000,
+            'created_at' => '2026-10-27 10:00:00',
+            'updated_at' => '2026-10-27 10:00:00',
+        ],
+        [
+            'transaction_id' => $trx1,
+            'product_name' => 'Custom Item',
+            'category_name' => null,
+            'product_price' => 5000,
+            'quantity' => 10,
+            'subtotal' => 50000,
+            'created_at' => '2026-10-27 10:00:00',
+            'updated_at' => '2026-10-27 10:00:00',
+        ],
+    ]);
+
+    // Insert Items for Trx 2:
+    // Daifuku Buah Segar: 40 (total becomes 90)
+    // Paket Gift Box (Mix 4/6): 33
+    DB::table('transaction_items')->insert([
+        [
+            'transaction_id' => $trx2,
+            'product_name' => 'Kiwifuku',
+            'category_name' => 'Daifuku Buah Segar',
+            'product_price' => 10000,
+            'quantity' => 40,
+            'subtotal' => 400000,
+            'created_at' => '2026-10-27 15:00:00',
+            'updated_at' => '2026-10-27 15:00:00',
+        ],
+        [
+            'transaction_id' => $trx2,
+            'product_name' => 'Gift Box 4',
+            'category_name' => 'Paket Gift Box (Mix 4/6)',
+            'product_price' => 40000,
+            'quantity' => 33,
+            'subtotal' => 1320000,
+            'created_at' => '2026-10-27 15:00:00',
+            'updated_at' => '2026-10-27 15:00:00',
+        ],
+    ]);
+
+    // Items for Pending Trx (must not be counted)
+    DB::table('transaction_items')->insert([
+        [
+            'transaction_id' => $trxPending,
+            'product_name' => 'Kiwifuku',
+            'category_name' => 'Daifuku Buah Segar',
+            'product_price' => 10000,
+            'quantity' => 99,
+            'subtotal' => 990000,
+            'created_at' => '2026-10-27 16:00:00',
+            'updated_at' => '2026-10-27 16:00:00',
+        ],
+    ]);
+
+    $result = $this->service->getCategorySales('daily', '2026-10-27');
+
+    // Total Qty: 90 + 41 + 33 = 164
+    // Daifuku Buah Segar: 90 / 164 = 54.87% -> 55%
+    // Classic Traditional Mochi: 41 / 164 = 25%
+    // Paket Gift Box (Mix 4/6): 33 / 164 = 20.12% -> 20%
+    expect($result)->toBe([
+        'total_qty' => 164,
+        'categories' => [
+            ['name' => 'Daifuku Buah Segar', 'qty' => 90, 'percentage' => 55],
+            ['name' => 'Classic Traditional Mochi', 'qty' => 41, 'percentage' => 25],
+            ['name' => 'Paket Gift Box (Mix 4/6)', 'qty' => 33, 'percentage' => 20],
+        ],
+    ]);
+});
