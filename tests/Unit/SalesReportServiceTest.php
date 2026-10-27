@@ -278,3 +278,153 @@ test('getSummary works for weekly and monthly periods with correct labels', func
 
     Carbon::setTestNow();
 });
+
+test('getChartData returns daily chart with 24 hours gap-filled', function () {
+    $user = User::factory()->create();
+
+    // Insert 2 completed transactions at 10:15 and 14:45
+    DB::table('transactions')->insert([
+        [
+            'transaction_code' => 'TRX-20261027-C01',
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 50000,
+            'status' => 'completed',
+            'created_at' => '2026-10-27 10:15:00',
+            'updated_at' => '2026-10-27 10:15:00',
+        ],
+        [
+            'transaction_code' => 'TRX-20261027-C02',
+            'user_id' => $user->id,
+            'payment_method' => 'qris',
+            'total_amount' => 150000,
+            'status' => 'completed',
+            'created_at' => '2026-10-27 14:45:00',
+            'updated_at' => '2026-10-27 14:45:00',
+        ],
+        [
+            // Pending transaction should be ignored
+            'transaction_code' => 'TRX-20261027-C03',
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 300000,
+            'status' => 'pending',
+            'created_at' => '2026-10-27 14:50:00',
+            'updated_at' => '2026-10-27 14:50:00',
+        ],
+    ]);
+
+    $chart = $this->service->getChartData('daily', '2026-10-27');
+
+    expect($chart['labels'])->toHaveCount(24)
+        ->and($chart['labels'][0])->toBe('00:00')
+        ->and($chart['labels'][10])->toBe('10:00')
+        ->and($chart['labels'][14])->toBe('14:00')
+        ->and($chart['labels'][23])->toBe('23:00')
+        ->and($chart['datasets'][0]['data'])->toHaveCount(24)
+        ->and($chart['datasets'][0]['data'][10])->toBe(50000)
+        ->and($chart['datasets'][0]['data'][14])->toBe(150000)
+        ->and($chart['datasets'][0]['data'][0])->toBe(0)
+        ->and($chart['peak'])->toBe([
+            'label' => '14:00',
+            'value' => 150000,
+        ]);
+});
+
+test('getChartData returns weekly chart with 7 days and correct peak', function () {
+    $user = User::factory()->create();
+
+    // Week of 2026-10-28:
+    // Senin: 2026-10-26
+    // Rabu: 2026-10-28 (peak)
+    // Minggu: 2026-11-01
+    DB::table('transactions')->insert([
+        [
+            'transaction_code' => 'TRX-W01',
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 120000,
+            'status' => 'completed',
+            'created_at' => '2026-10-26 10:00:00', // Senin
+            'updated_at' => '2026-10-26 10:00:00',
+        ],
+        [
+            'transaction_code' => 'TRX-W02',
+            'user_id' => $user->id,
+            'payment_method' => 'qris',
+            'total_amount' => 740000,
+            'status' => 'completed',
+            'created_at' => '2026-10-28 11:00:00', // Rabu
+            'updated_at' => '2026-10-28 11:00:00',
+        ],
+        [
+            'transaction_code' => 'TRX-W03',
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 200000,
+            'status' => 'completed',
+            'created_at' => '2026-11-01 16:00:00', // Minggu
+            'updated_at' => '2026-11-01 16:00:00',
+        ],
+    ]);
+
+    $chart = $this->service->getChartData('weekly', '2026-10-28');
+
+    expect($chart['labels'])->toBe(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'])
+        ->and($chart['datasets'][0]['data'])->toBe([120000, 0, 740000, 0, 0, 0, 200000])
+        ->and($chart['peak'])->toBe([
+            'label' => 'Rabu',
+            'value' => 740000,
+        ]);
+});
+
+test('getChartData returns monthly chart with exact days in month', function () {
+    $user = User::factory()->create();
+
+    // October 2026 has 31 days
+    DB::table('transactions')->insert([
+        [
+            'transaction_code' => 'TRX-M01',
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 250000,
+            'status' => 'completed',
+            'created_at' => '2026-10-05 09:00:00', // Day 5
+            'updated_at' => '2026-10-05 09:00:00',
+        ],
+        [
+            'transaction_code' => 'TRX-M02',
+            'user_id' => $user->id,
+            'payment_method' => 'qris',
+            'total_amount' => 500000,
+            'status' => 'completed',
+            'created_at' => '2026-10-20 14:00:00', // Day 20 (peak)
+            'updated_at' => '2026-10-20 14:00:00',
+        ],
+    ]);
+
+    $chart = $this->service->getChartData('monthly', '2026-10-15');
+
+    expect($chart['labels'])->toHaveCount(31)
+        ->and($chart['labels'][0])->toBe('1')
+        ->and($chart['labels'][30])->toBe('31')
+        ->and($chart['datasets'][0]['data'])->toHaveCount(31)
+        ->and($chart['datasets'][0]['data'][4])->toBe(250000) // Day 5 index 4
+        ->and($chart['datasets'][0]['data'][19])->toBe(500000) // Day 20 index 19
+        ->and($chart['datasets'][0]['data'][0])->toBe(0)
+        ->and($chart['peak'])->toBe([
+            'label' => '20',
+            'value' => 500000,
+        ]);
+});
+
+test('getChartData handles empty period with zero peak', function () {
+    $chart = $this->service->getChartData('weekly', '2026-10-28');
+
+    expect($chart['labels'])->toHaveCount(7)
+        ->and($chart['datasets'][0]['data'])->toBe([0, 0, 0, 0, 0, 0, 0])
+        ->and($chart['peak'])->toBe([
+            'label' => null,
+            'value' => 0,
+        ]);
+});

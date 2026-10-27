@@ -171,4 +171,156 @@ class SalesReportService
             'period_label' => $periodLabel,
         ];
     }
+
+    /**
+     * Mengambil data chart per jam (daily), per hari (weekly), atau per tanggal (monthly).
+     *
+     * @param  string  $period  'daily' | 'weekly' | 'monthly'
+     */
+    public function getChartData(string $period, DateTimeInterface|string|null $date = null): array
+    {
+        [$startDate, $endDate] = $this->resolveDateRange($period, $date);
+
+        $driver = DB::connection()->getDriverName();
+
+        return match ($period) {
+            'daily' => $this->getDailyChartData($startDate, $endDate, $driver),
+            'weekly' => $this->getWeeklyChartData($startDate, $endDate, $driver),
+            'monthly' => $this->getMonthlyChartData($startDate, $endDate, $driver),
+            default => throw new InvalidArgumentException("Periode [{$period}] tidak valid. Gunakan 'daily', 'weekly', atau 'monthly'."),
+        };
+    }
+
+    /**
+     * Data chart harian (24 jam: 00:00 - 23:00).
+     */
+    protected function getDailyChartData(CarbonInterface $startDate, CarbonInterface $endDate, string $driver): array
+    {
+        $hourExpr = match ($driver) {
+            'sqlite' => "CAST(strftime('%H', created_at) AS INTEGER)",
+            'pgsql' => 'EXTRACT(HOUR FROM created_at)::INTEGER',
+            default => 'HOUR(created_at)',
+        };
+
+        $rows = DB::table('transactions')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw("{$hourExpr} AS label, SUM(total_amount) AS revenue")
+            ->groupByRaw($hourExpr)
+            ->get();
+
+        $labels = array_map(fn ($h) => sprintf('%02d:00', $h), range(0, 23));
+        $data = array_fill(0, 24, 0);
+
+        foreach ($rows as $row) {
+            $hour = (int) $row->label;
+            if ($hour >= 0 && $hour < 24) {
+                $revenue = (float) $row->revenue;
+                $data[$hour] = ((int) $revenue == $revenue) ? (int) $revenue : $revenue;
+            }
+        }
+
+        return $this->formatChartResponse($labels, $data);
+    }
+
+    /**
+     * Data chart mingguan (7 hari: Senin - Minggu).
+     */
+    protected function getWeeklyChartData(CarbonInterface $startDate, CarbonInterface $endDate, string $driver): array
+    {
+        $dayOfWeekExpr = match ($driver) {
+            'sqlite' => "(CAST(strftime('%w', created_at) AS INTEGER) + 1)",
+            'pgsql' => '(EXTRACT(DOW FROM created_at)::INTEGER + 1)',
+            default => 'DAYOFWEEK(created_at)',
+        };
+
+        $rows = DB::table('transactions')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw("{$dayOfWeekExpr} AS day_num, SUM(total_amount) AS revenue")
+            ->groupByRaw($dayOfWeekExpr)
+            ->get();
+
+        $labels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+        $data = array_fill(0, 7, 0);
+
+        $dayIndexMap = [
+            2 => 0, // Senin
+            3 => 1, // Selasa
+            4 => 2, // Rabu
+            5 => 3, // Kamis
+            6 => 4, // Jumat
+            7 => 5, // Sabtu
+            1 => 6, // Minggu
+        ];
+
+        foreach ($rows as $row) {
+            $dayNum = (int) $row->day_num;
+            if (isset($dayIndexMap[$dayNum])) {
+                $revenue = (float) $row->revenue;
+                $data[$dayIndexMap[$dayNum]] = ((int) $revenue == $revenue) ? (int) $revenue : $revenue;
+            }
+        }
+
+        return $this->formatChartResponse($labels, $data);
+    }
+
+    /**
+     * Data chart bulanan (28 - 31 hari per tanggal).
+     */
+    protected function getMonthlyChartData(CarbonInterface $startDate, CarbonInterface $endDate, string $driver): array
+    {
+        $dayExpr = match ($driver) {
+            'sqlite' => "CAST(strftime('%d', created_at) AS INTEGER)",
+            'pgsql' => 'EXTRACT(DAY FROM created_at)::INTEGER',
+            default => 'DAY(created_at)',
+        };
+
+        $rows = DB::table('transactions')
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw("{$dayExpr} AS label, SUM(total_amount) AS revenue")
+            ->groupByRaw($dayExpr)
+            ->get();
+
+        $daysInMonth = (int) $startDate->daysInMonth;
+        $labels = array_map(fn ($d) => (string) $d, range(1, $daysInMonth));
+        $data = array_fill(0, $daysInMonth, 0);
+
+        foreach ($rows as $row) {
+            $day = (int) $row->label;
+            if ($day >= 1 && $day <= $daysInMonth) {
+                $revenue = (float) $row->revenue;
+                $data[$day - 1] = ((int) $revenue == $revenue) ? (int) $revenue : $revenue;
+            }
+        }
+
+        return $this->formatChartResponse($labels, $data);
+    }
+
+    /**
+     * Format output standar untuk chart data.
+     *
+     * @param  array<string>  $labels
+     * @param  array<int|float>  $data
+     */
+    protected function formatChartResponse(array $labels, array $data): array
+    {
+        $maxValue = ! empty($data) ? max($data) : 0;
+        $peakIndex = ! empty($data) ? array_search($maxValue, $data) : false;
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Pendapatan (IDR)',
+                    'data' => $data,
+                ],
+            ],
+            'peak' => [
+                'label' => ($maxValue > 0 && $peakIndex !== false) ? $labels[$peakIndex] : null,
+                'value' => $maxValue,
+            ],
+        ];
+    }
 }
