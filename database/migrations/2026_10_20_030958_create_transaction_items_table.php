@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('product_price', 12, 2);
             $table->unsignedInteger('quantity');
             $table->decimal('subtotal', 12, 2);
+            $table->index('product_id');
+            $table->index('transaction_id');
             $table->timestamps();
         });
     }
