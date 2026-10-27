@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Transaction;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -363,5 +365,33 @@ class SalesReportService
             'total_qty' => $totalQty,
             'categories' => $categories,
         ];
+    }
+
+    /**
+     * Mengambil riwayat transaksi dengan pagination dan fitur pencarian.
+     *
+     * @param  string  $period  'daily' | 'weekly' | 'monthly'
+     */
+    public function getTransactionHistory(
+        string $period,
+        DateTimeInterface|string|null $date = null,
+        ?string $search = null,
+        ?int $page = null,
+        int $perPage = 10
+    ): LengthAwarePaginator {
+        [$startDate, $endDate] = $this->resolveDateRange($period, $date);
+
+        return Transaction::with(['items' => fn ($q) => $q->select('id', 'transaction_id', 'product_name', 'quantity')])
+            ->select(['id', 'transaction_code', 'payment_method', 'total_amount', 'status', 'created_at'])
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->when($search, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('transaction_code', 'like', "%{$search}%")
+                        ->orWhereHas('items', fn ($q) => $q->where('product_name', 'like', "%{$search}%"));
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 }

@@ -566,3 +566,158 @@ test('getCategorySales calculates category quantities and percentages correctly'
         ],
     ]);
 });
+
+test('getTransactionHistory returns paginated completed transactions with items', function () {
+    $user = User::factory()->create();
+
+    // Completed transaction 1 (newer)
+    $trx1 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-20261027-HIST01',
+        'user_id' => $user->id,
+        'payment_method' => 'qris',
+        'total_amount' => 100000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 15:00:00',
+        'updated_at' => '2026-10-27 15:00:00',
+    ]);
+
+    // Completed transaction 2 (older)
+    $trx2 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-20261027-HIST02',
+        'user_id' => $user->id,
+        'payment_method' => 'cash',
+        'total_amount' => 50000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 10:00:00',
+        'updated_at' => '2026-10-27 10:00:00',
+    ]);
+
+    // Pending transaction (should be excluded)
+    DB::table('transactions')->insert([
+        'transaction_code' => 'TRX-20261027-PENDING',
+        'user_id' => $user->id,
+        'payment_method' => 'cash',
+        'total_amount' => 30000,
+        'status' => 'pending',
+        'created_at' => '2026-10-27 11:00:00',
+        'updated_at' => '2026-10-27 11:00:00',
+    ]);
+
+    // Items for trx 1
+    DB::table('transaction_items')->insert([
+        'transaction_id' => $trx1,
+        'product_name' => 'Ichigo Daifuku',
+        'product_price' => 25000,
+        'quantity' => 4,
+        'subtotal' => 100000,
+        'created_at' => '2026-10-27 15:00:00',
+        'updated_at' => '2026-10-27 15:00:00',
+    ]);
+
+    // Items for trx 2
+    DB::table('transaction_items')->insert([
+        'transaction_id' => $trx2,
+        'product_name' => 'Matcha Daifuku',
+        'product_price' => 25000,
+        'quantity' => 2,
+        'subtotal' => 50000,
+        'created_at' => '2026-10-27 10:00:00',
+        'updated_at' => '2026-10-27 10:00:00',
+    ]);
+
+    $paginator = $this->service->getTransactionHistory('daily', '2026-10-27');
+
+    expect($paginator->total())->toBe(2)
+        ->and($paginator->count())->toBe(2)
+        ->and($paginator->first()->transaction_code)->toBe('TRX-20261027-HIST01') // sorted by created_at DESC
+        ->and($paginator->first()->items)->toHaveCount(1)
+        ->and($paginator->first()->items->first()->product_name)->toBe('Ichigo Daifuku');
+});
+
+test('getTransactionHistory filters by search query on code or item name', function () {
+    $user = User::factory()->create();
+
+    $trx1 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-ABC-01',
+        'user_id' => $user->id,
+        'payment_method' => 'cash',
+        'total_amount' => 25000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 10:00:00',
+        'updated_at' => '2026-10-27 10:00:00',
+    ]);
+
+    $trx2 = DB::table('transactions')->insertGetId([
+        'transaction_code' => 'TRX-XYZ-02',
+        'user_id' => $user->id,
+        'payment_method' => 'qris',
+        'total_amount' => 50000,
+        'status' => 'completed',
+        'created_at' => '2026-10-27 11:00:00',
+        'updated_at' => '2026-10-27 11:00:00',
+    ]);
+
+    DB::table('transaction_items')->insert([
+        [
+            'transaction_id' => $trx1,
+            'product_name' => 'Choco Berry Mochi',
+            'product_price' => 25000,
+            'quantity' => 1,
+            'subtotal' => 25000,
+            'created_at' => '2026-10-27 10:00:00',
+            'updated_at' => '2026-10-27 10:00:00',
+        ],
+        [
+            'transaction_id' => $trx2,
+            'product_name' => 'Matcha Red Bean',
+            'product_price' => 25000,
+            'quantity' => 2,
+            'subtotal' => 50000,
+            'created_at' => '2026-10-27 11:00:00',
+            'updated_at' => '2026-10-27 11:00:00',
+        ],
+    ]);
+
+    // Search by code: 'ABC'
+    $byCode = $this->service->getTransactionHistory('daily', '2026-10-27', search: 'ABC');
+    expect($byCode->total())->toBe(1)
+        ->and($byCode->first()->transaction_code)->toBe('TRX-ABC-01');
+
+    // Search by product name: 'Matcha'
+    $byProduct = $this->service->getTransactionHistory('daily', '2026-10-27', search: 'Matcha');
+    expect($byProduct->total())->toBe(1)
+        ->and($byProduct->first()->transaction_code)->toBe('TRX-XYZ-02');
+
+    // Search not found
+    $notFound = $this->service->getTransactionHistory('daily', '2026-10-27', search: 'Durian');
+    expect($notFound->total())->toBe(0);
+});
+
+test('getTransactionHistory paginates correctly with page parameter', function () {
+    $user = User::factory()->create();
+
+    for ($i = 1; $i <= 15; $i++) {
+        DB::table('transactions')->insert([
+            'transaction_code' => sprintf('TRX-PAGE-%02d', $i),
+            'user_id' => $user->id,
+            'payment_method' => 'cash',
+            'total_amount' => 10000,
+            'status' => 'completed',
+            'created_at' => sprintf('2026-10-27 10:%02d:00', $i),
+            'updated_at' => sprintf('2026-10-27 10:%02d:00', $i),
+        ]);
+    }
+
+    // Page 1 with perPage = 10
+    $page1 = $this->service->getTransactionHistory('daily', '2026-10-27', page: 1, perPage: 10);
+    expect($page1->total())->toBe(15)
+        ->and($page1->count())->toBe(10)
+        ->and($page1->currentPage())->toBe(1)
+        ->and($page1->hasMorePages())->toBeTrue();
+
+    // Page 2
+    $page2 = $this->service->getTransactionHistory('daily', '2026-10-27', page: 2, perPage: 10);
+    expect($page2->count())->toBe(5)
+        ->and($page2->currentPage())->toBe(2)
+        ->and($page2->hasMorePages())->toBeFalse();
+});
