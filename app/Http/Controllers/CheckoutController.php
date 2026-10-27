@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Services\SalesReportService;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
-use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -22,7 +23,8 @@ class CheckoutController extends Controller
         $productIds = array_column($validated['items'], 'product_id');
 
         // Ambil data produk berdasarkan ID yang dikirim
-        $products = Product::whereIn('id', $productIds)
+        $products = Product::with('category')
+            ->whereIn('id', $productIds)
             ->lockForUpdate()
             ->get()
             ->keyBy('id');
@@ -34,14 +36,14 @@ class CheckoutController extends Controller
             $product = $products->get($item['product_id']);
 
             // Cek ketersediaan produk di database
-            if (!$product) {
+            if (! $product) {
                 throw ValidationException::withMessages([
                     'items' => 'Produk tidak ditemukan.',
                 ]);
             }
 
             // Cek produk aktif
-            if (!$product->is_active) {
+            if (! $product->is_active) {
                 throw ValidationException::withMessages([
                     'items' => "Produk '{$product->name}' sedang tidak tersedia.",
                 ]);
@@ -83,13 +85,13 @@ class CheckoutController extends Controller
 
             $transaction = Transaction::create([
                 'transaction_code' => $transactionCode,
-                'user_id'          => $request->user()?->id ?? Auth::id(),
-                'payment_method'   => $validated['payment_method'],
-                'total_amount'     => $totalAmount,
-                'amount_paid'      => $amountPaid,
-                'change_amount'    => $changeAmount,
-                'status'           => 'completed',
-                'notes'            => $validated['notes'] ?? null,
+                'user_id' => $request->user()?->id ?? Auth::id(),
+                'payment_method' => $validated['payment_method'],
+                'total_amount' => $totalAmount,
+                'amount_paid' => $amountPaid,
+                'change_amount' => $changeAmount,
+                'status' => 'completed',
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             // c. Loop items → buat TransactionItem (dengan snapshot nama & harga)
@@ -99,12 +101,12 @@ class CheckoutController extends Controller
                 $subtotalItem = $product->price * $item['quantity'];
 
                 $transaction->items()->create([
-                    'product_id'    => $product->id,
-                    'product_name'  => $product->name,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
                     'product_price' => $product->price,
                     'category_name' => $product->category->name,
-                    'quantity'      => $item['quantity'],
-                    'subtotal'      => $subtotalItem,
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $subtotalItem,
                 ]);
 
                 // Kurangi stock setiap produk
@@ -114,10 +116,16 @@ class CheckoutController extends Controller
             return $transaction;
         });
 
+        // Flush cache laporan penjualan
+        if (Cache::supportsTags()) {
+            Cache::tags(['sales_report'])->flush();
+        }
+        app(SalesReportService::class)->flushCache();
+
         if ($request->wantsJson()) {
             return response()->json([
-                'success'     => true,
-                'message'     => 'Transaksi berhasil disimpan.',
+                'success' => true,
+                'message' => 'Transaksi berhasil disimpan.',
                 'transaction' => $transaction->load('items'),
             ], 201);
         }
@@ -141,15 +149,15 @@ class CheckoutController extends Controller
         $transaction->load(['items', 'user']);
 
         $pdf = FacadePdf::loadView('receipts.pdf', [
-            'transaction'  => $transaction,
-            'store_name'    => env('STORE_NAME', 'Mochimod'),
+            'transaction' => $transaction,
+            'store_name' => env('STORE_NAME', 'Mochimod'),
             'store_address' => env('STORE_ADDRESS', ''),
-            'store_phone'   => env('STORE_PHONE', ''),
+            'store_phone' => env('STORE_PHONE', ''),
         ]);
 
         $pdf->setPaper('A5', 'portrait');
 
-        $filename = 'nota-' . $transaction->transaction_code . '.pdf';
+        $filename = 'nota-'.$transaction->transaction_code.'.pdf';
 
         return $pdf->download($filename);
     }

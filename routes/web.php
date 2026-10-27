@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
 
     // Route for Sale Report
     Route::get('/laporan-penjualan', [SalesReportController::class, 'show'])->name('Sales Report');
-    
+
     // Route for Logout
     Route::post('/logout', function () {
         Auth::logout();
@@ -35,9 +35,9 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 
     // Route for Product
-    Route::resource("/products", ProductController::class)
+    Route::resource('/products', ProductController::class)
         ->middleware('auth.basic')
-        ->except("create", "show", "edit");
+        ->except('create', 'show', 'edit');
 
     // Route for Checkout
     Route::prefix('checkout')->name('checkout.')->group(function () {
@@ -47,9 +47,9 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route for Sales Report
-    Route::prefix('laporan-penjualan')->name('sales-report')->group(function() {
+    Route::prefix('laporan-penjualan')->name('sales-report.')->group(function () {
         Route::get('/', [SalesReportController::class, 'show'])->name('index');
-        Route::get('/summary', [SalesReportController::class], 'summary')->name('summary');
+        Route::get('/summary', [SalesReportController::class, 'summary'])->name('summary');
         Route::get('/chart', [SalesReportController::class, 'chart'])->name('chart');
         Route::get('/history', [SalesReportController::class, 'history'])->name('history');
         Route::get('/pdf', [SalesReportController::class, 'downloadPdf'])->name('pdf');

@@ -22,8 +22,10 @@ class SalesReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'period'  => ['required', 'in:daily,weekly,monthly'],
-            'date'    => ['nullable', 'date']
+            'period' => ['required', 'in:daily,weekly,monthly'],
+            'date' => ['nullable', 'date'],
+            'search' => ['nullable', 'string'],
+            'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

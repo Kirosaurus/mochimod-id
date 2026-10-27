@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Transaction;
 use Carbon\CarbonInterface;
+use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -394,4 +396,40 @@ class SalesReportService
             ->orderByDesc('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    /**
+     * Cache wrapper yang mendukung Cache Tags jika tersedia (Redis/Memcached),
+     * atau fallback versioning jika driver tidak mendukung tagging (database/file).
+     */
+    public function rememberCache(string $key, string $period, Closure $callback): mixed
+    {
+        $ttl = match ($period) {
+            'daily' => now()->addMinutes(5),
+            'weekly' => now()->addMinutes(30),
+            'monthly' => now()->addHours(2),
+            default => now()->addMinutes(15),
+        };
+
+        if (Cache::supportsTags()) {
+            return Cache::tags(['sales_report'])->remember($key, $ttl, $callback);
+        }
+
+        $version = Cache::get('sales_report_version', 1);
+        $versionedKey = "{$key}.v{$version}";
+
+        return Cache::remember($versionedKey, $ttl, $callback);
+    }
+
+    /**
+     * Flush cache laporan penjualan.
+     */
+    public function flushCache(): void
+    {
+        if (Cache::supportsTags()) {
+            Cache::tags(['sales_report'])->flush();
+        } else {
+            Cache::increment('sales_report_version');
+        }
+    }
 }
+
