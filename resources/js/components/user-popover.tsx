@@ -1,101 +1,76 @@
-import {router, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState} from 'react';
-import type { Auth } from '@/types/auth';
+import { router, usePage } from "@inertiajs/react";
+import { useEffect, useRef, useState } from "react";
+import type { Auth } from "@/types/auth";
 
 type PageProps = {
     auth: Auth;
 };
 
-function SettingsIcon() {
+function LogoutIcon() {
     return (
         <svg
-
-        
-        aria-hidden='true'
-        className='h-5 w-5'
-        fill='none'
-        viewBox='0 0 24 24'
-        stroke='currentColor'
-        strokeWidth='1.8'
-
-    >  
-
-    <path
-    strokeLinecap='round'  
-    strokeLinejoin='round'
-    d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543-.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543-.826-3.31z'
-
-    />
-
-    <circle cx='12' cy='11.25' r='2.25' />
-    </svg>
-
-    );
-}
-
-function LogoutIcon(){
-    return (
-        <svg
-        aria-hidden='true'
-        className="h-5 w-5"
-        fill="none"
-        viewBox='0 0 24 24'
-        stroke='currentColor'
-        strokeWidth='1.8'
+            aria-hidden="true"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="1.8"
         >
             <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M14.25 8.25V6.7  5A2.25 2.25 0 0 0 12 4.5H6.75A2.25 2.25 0 0 0 4.5 6.75v9a2.25 2.25 0 0 0 2.25 2.25H12a2.25 2.25 0 0 0 2.25-2.25v-1.5M10.5 12h9m0 0-3-3m3 3-3 3'
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14.25 8.25V6.75A2.25 2.25 0 0 0 12 4.5H6.75A2.25 2.25 0 0 0 4.5 6.75v9a2.25 2.25 0 0 0 2.25 2.25H12a2.25 2.25 0 0 0 2.25-2.25v-1.5M10.5 12h9m0 0-3-3m3 3-3 3"
             />
         </svg>
     );
 }
 
-export default function UserPopover () {
+export default function UserPopover() {
     const { auth } = usePage<PageProps>().props;
-    const [ open, setOpen ] = useState(false);
+    const [open, setOpen] = useState(false);
     const popoverRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         function closeWhenClickedOutside(event: MouseEvent) {
-
-            if ( popoverRef.current && 
+            if (
+                popoverRef.current &&
                 !popoverRef.current.contains(event.target as Node)
             ) {
                 setOpen(false);
             }
         }
 
-    function closeWithEscape(event: KeyboardEvent) {
-        if (event.key === "Escape"){
-            setOpen(false);
-
+        function closeWithEscape(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setOpen(false);
+            }
         }
 
-    }
-    
-    document.addEventListener("mousedown", closeWhenClickedOutside);
-    document.addEventListener("keydown", closeWithEscape);
+        document.addEventListener("mousedown", closeWhenClickedOutside);
+        document.addEventListener("keydown", closeWithEscape);
 
-    return () => {
-        document.removeEventListener(
-            "mousedown",
-            closeWhenClickedOutside,
-        );
-        document.removeEventListener(
-            "keydown",
-            closeWithEscape,);
-    };
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                closeWhenClickedOutside,
+            );
+            document.removeEventListener("keydown", closeWithEscape);
+        };
     }, []);
+
     function handleLogout() {
-        router.post('/Logout');
+        router.post("/logout");
     }
 
     return (
-        <div ref={popoverRef} className='relative'>
+        <div
+            ref={popoverRef}
+            className="relative before:absolute before:right-0 before:top-full before:h-3 before:w-72"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+        >
             <button
-            type="button"
+                type="button"
                 aria-label="Buka menu akun"
                 aria-expanded={open}
                 aria-haspopup="menu"
@@ -134,16 +109,7 @@ export default function UserPopover () {
                         </p>
                     </div>
 
-                    <div className="mt-3 space-y-1">
-                        <button
-                            type="button"
-                            role="menuitem"
-                            className="flex w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-200"
-                        >
-                            <SettingsIcon />
-                            <span>Pengaturan</span>
-                        </button>
-
+                    <div className="mt-3">
                         <button
                             type="button"
                             role="menuitem"
