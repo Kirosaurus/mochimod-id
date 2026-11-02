@@ -81,6 +81,8 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
             $data['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            unset($data['image']);
         }
 
         $product->update($data);

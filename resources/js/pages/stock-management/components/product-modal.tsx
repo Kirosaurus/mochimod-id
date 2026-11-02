@@ -248,7 +248,9 @@ export default function ProductModal({
                                     className="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
                                 />
                                 <p className="mt-1 text-[11px] text-slate-400">
-                                    Format: JPG, PNG, WEBP (Maks. 5MB)
+                                    {isEditMode
+                                        ? "Pilih foto baru jika ingin mengganti. Biarkan kosong jika tidak ingin mengubah foto."
+                                        : "Format: JPG, PNG, WEBP (Maks. 5MB)"}
                                 </p>
                             </div>
                         </div>
