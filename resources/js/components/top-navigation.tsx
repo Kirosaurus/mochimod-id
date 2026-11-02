@@ -40,10 +40,10 @@ export default function TopBar() {
                                 </div>
                                 <div>
                                     <a
-                                        href="/manajemen-stok"
-                                        className="font-semibold hover:scale-"
+                                        href="/products"
+                                        className="font-semibold"
                                     >
-                                        <button className={`${usePage().url === '/manajemen-stok' ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
+                                        <button className={`${usePage().url.startsWith('/products') ? 'bg-accent text-white' : 'bg-white hover:bg-[#EEEEEE]'} cursor-pointer duration-300 ease-in-out px-[16px] py-[8px] rounded-[8px]`}>
                                             Kelola Stok
                                         </button>
                                     </a>
