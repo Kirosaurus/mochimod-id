@@ -35,14 +35,16 @@ class SalesReportController extends Controller
         $date = $request->validated('date');
         $dateFormatted = ($date ? Carbon::parse($date) : Carbon::today())->format('Y-m-d');
 
-        $cacheKey = "sales_report.summary.{$period}.{$dateFormatted}";
+        $cacheKey = "sales_report.summary.v2.{$period}.{$dateFormatted}";
 
         $data = $this->salesReportService->rememberCache($cacheKey, $period, function () use ($period, $date) {
             $summary = $this->salesReportService->getSummary($period, $date);
             $categorySales = $this->salesReportService->getCategorySales($period, $date);
+            $chartData = $this->salesReportService->getChartData($period, $date);
 
             return array_merge($summary, [
                 'category_sales' => $categorySales,
+                'chart' => $chartData,
             ]);
         });
 

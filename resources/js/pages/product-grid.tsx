@@ -20,25 +20,25 @@ export default function ProductGrid({ products, onAdd }: props) {
     }
 
     return (
-        <div className="w-full overflow-x-auto no-scrollbar">
-            <div className="grid grid-flow-row grid-cols-6 auto-rows-auto gap-4 p-[2px]">
+        <div className="w-full min-w-0">
+            <div className="grid auto-rows-auto grid-cols-2 gap-3 p-[2px] sm:grid-cols-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-6">
                 {products.map((product) => (
                     <button 
                         key={product.id}
                         onClick={() => onAdd(product)}
-                        className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out"
+                        className="flex h-full w-full min-w-0 cursor-pointer flex-col rounded-xl border border-gray-200 bg-white p-2.5 shadow-[0px_1px_10px_0px_var(--color-gray-200)] transition duration-300 ease-in-out hover:-translate-y-0.5 hover:border-accent sm:p-3"
                     >
                         <div className="flex flex-col gap-[4px]">
-                            <div className="w-full h-[128px] shrink-0 bg-black rounded-[8px]"></div>
-                            <div className="flex flex-row w-fill items-center justify-between">
+                            <div className="h-20 w-full shrink-0 rounded-lg bg-black sm:h-28"></div>
+                            <div className="flex w-full items-center justify-between">
                                 <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
                                     <p className="text-success font-bold text-small">
-                                        Stok : {product.stock}
+                                        Stok: {product.stock}
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex h-[75px]">
-                                <p className="font-bold text-normal">
+                            <div className="flex min-h-14 sm:h-[75px]">
+                                <p className="line-clamp-2 text-sm font-bold sm:text-base">
                                     {product.name}
                                 </p>
                             </div>
@@ -48,7 +48,7 @@ export default function ProductGrid({ products, onAdd }: props) {
                             <div className="flex flex-row gap-[14px] justify-between">
                                 <div className="flex flex-col text-left">
                                     <p className="text-small">Harga</p>
-                                    <p className="text-normal font-bold text-nowrap">
+                                    <p className="truncate text-sm font-bold sm:text-base">
                                         Rp {product.price}
                                     </p>
                                 </div>

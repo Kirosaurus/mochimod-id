@@ -35,10 +35,10 @@ export default function Pos({ products, categories }: props) {
             <Head title="POS Order - Mochimod" />
 
             <main>
-                <div className="w-full h-[90vh] p-[16px]">
-                    <div className="h-full flex d-flex-row gap-[16px]">
-                        <div className="flex flex-col w-full corner-[16px] gap-[12px] ">
-                            <div className="w-full h-auto p-[8px] bg-white rounded-[12px] border border-gray-200 flex flex-row items-center gap-[10px]">
+                <div className="min-h-[calc(100vh-64px)] w-full p-3 sm:p-4">
+                    <div className="flex min-h-[calc(100vh-88px)] flex-col gap-4 lg:flex-row">
+                        <div className="flex min-w-0 flex-1 flex-col gap-3">
+                            <div className="flex w-full items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
                                 <div
                                     className={`w-full relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#374272] bg-[#F8FAFC] duration-300 ease-in-out`}
                                 >
@@ -68,11 +68,11 @@ export default function Pos({ products, categories }: props) {
                                         onChange={(e) =>
                                             setSearch(e.target.value)
                                         }
-                                        placeholder="Cari Produk... (Nama Produk atau Kode Produk)"
-                                        className="w-full bg-transparent py-[8px] pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
+                                        placeholder="Cari produk..."
+                                        className="w-full min-w-0 bg-transparent py-2 pl-11 pr-3 text-sm text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition-colors duration-300 ease-in-out"
                                     />
                                 </div>
-                                <div className="w-9 h-9 rounded-[8px] bg-[#F8FAFC] text-white flex items-center justify-center font-bold text-xs shadow-xs hover:scale-110 duration-300 ease-in-out cursor-pointer">
+                                <div className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[#F8FAFC] text-white shadow-xs transition duration-300 hover:scale-110">
                                     <svg
                                         width="16px"
                                         height="16px"
@@ -90,12 +90,12 @@ export default function Pos({ products, categories }: props) {
                                 </div>
                                 {/* Search bar dan toolbar lainnya */}
                             </div>
-                            <div className="flex flex-row gap-[8px] items-center overflow-x-auto pb-1">
+                            <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
                                 {/* Tombol "Semua Kategori" */}
                                 <button
                                     type="button"
                                     onClick={() => setSelectedCategory(null)}
-                                    className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer ${
+                                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 ${
                                         selectedCategory === null
                                             ? "bg-accent text-white shadow-sm"
                                             : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
@@ -112,7 +112,7 @@ export default function Pos({ products, categories }: props) {
                                         onClick={() =>
                                             setSelectedCategory(cat.id)
                                         }
-                                        className={`font-bold text-sm px-[16px] py-[6px] rounded-[50px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                                        className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 ${
                                             selectedCategory === cat.id
                                                 ? "bg-accent text-white shadow-sm"
                                                 : "bg-white text-slate-700 border border-gray-200 hover:border-accent hover:-translate-y-0.5"
@@ -125,7 +125,7 @@ export default function Pos({ products, categories }: props) {
                             </div>
                             <ProductGrid products={filtered} onAdd={addItem} />
                         </div>
-                        <div className="w-[395px] h-full p-[16px] bg-white corner-[16px] rounded-[16px] box-border border border-gray-200">
+                        <div className="flex min-h-[420px] w-full min-w-0 flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:min-h-[460px] lg:h-[calc(100vh-88px)] lg:w-[360px] lg:shrink-0 lg:p-4 xl:w-[395px]">
                             <CartPanel
                                 items={items}
                                 subtotal={subTotal}

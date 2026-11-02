@@ -1,6 +1,6 @@
-import { router, usePage } from "@inertiajs/react";
-import { useEffect, useRef, useState } from "react";
-import type { Auth } from "@/types/auth";
+import { router, usePage } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
+import type { Auth } from '@/types/auth';
 
 type PageProps = {
     auth: Auth;
@@ -41,40 +41,28 @@ export default function UserPopover() {
         }
 
         function closeWithEscape(event: KeyboardEvent) {
-            if (event.key === "Escape") {
+            if (event.key === 'Escape') {
                 setOpen(false);
             }
         }
 
-        document.addEventListener("mousedown", closeWhenClickedOutside);
-        document.addEventListener("keydown", closeWithEscape);
+        document.addEventListener('mousedown', closeWhenClickedOutside);
+        document.addEventListener('keydown', closeWithEscape);
 
         return () => {
-            document.removeEventListener(
-                "mousedown",
-                closeWhenClickedOutside,
-            );
-            document.removeEventListener("keydown", closeWithEscape);
+            document.removeEventListener('mousedown', closeWhenClickedOutside);
+            document.removeEventListener('keydown', closeWithEscape);
         };
     }, []);
 
-    function handleLogout() {
-        router.post("/logout");
-    }
-
     return (
-        <div
-            ref={popoverRef}
-            className="relative before:absolute before:right-0 before:top-full before:h-3 before:w-72"
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
-        >
+        <div ref={popoverRef} className="relative">
             <button
                 type="button"
                 aria-label="Buka menu akun"
                 aria-expanded={open}
                 aria-haspopup="menu"
-                className="w-9 h-9 rounded-full bg-accent/10 text-white flex items-center justify-center font-bold text-xs shadow-xs hover:scale-110 duration-300 ease-in-out cursor-pointer"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-accent/10 text-white shadow-xs transition duration-300 hover:scale-110"
                 onClick={() => setOpen((isOpen) => !isOpen)}
             >
                 <svg
@@ -103,17 +91,18 @@ export default function UserPopover() {
                         <p className="truncate text-[19px] font-bold leading-6 text-slate-900">
                             {auth.user.name}
                         </p>
-
                         <p className="truncate text-sm leading-5 text-slate-700">
                             {auth.user.email}
                         </p>
                     </div>
-
                     <div className="mt-3">
                         <button
                             type="button"
                             role="menuitem"
-                            onClick={handleLogout}
+                            onClick={() => {
+                                setOpen(false);
+                                router.post('/logout');
+                            }}
                             className="flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm text-rose-400 transition-colors hover:bg-rose-50"
                         >
                             <LogoutIcon />

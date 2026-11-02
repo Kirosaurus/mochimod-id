@@ -43,6 +43,7 @@ export default function CartPanel({
 
                         <div>
                             <svg
+                                className="h-auto w-full max-w-[220px] sm:max-w-[240px]"
                                 width="240"
                                 height="220"
                                 viewBox="0 0 270 245"

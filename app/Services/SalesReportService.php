@@ -89,19 +89,32 @@ class SalesReportService
         [$startDate, $endDate] = $this->resolveDateRange($period, $date);
         [$prevStartDate, $prevEndDate] = $this->resolvePreviousDateRange($period, $date);
 
-        // 1. Query Utama (Aggregates)
+        // 1. Query agregat periode aktif dan periode sebelumnya dalam satu query.
         $aggregates = DB::table('transactions')
             ->where('status', 'completed')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw("
-                COALESCE(SUM(total_amount), 0) AS total_revenue,
-                COUNT(*) AS total_transactions,
-                COALESCE(AVG(total_amount), 0) AS avg_ticket,
-                COALESCE(SUM(CASE WHEN payment_method = 'qris' THEN total_amount ELSE 0 END), 0) AS qris_amount,
-                COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN total_amount ELSE 0 END), 0) AS cash_amount,
-                COUNT(CASE WHEN payment_method = 'qris' THEN 1 END) AS qris_count,
-                COUNT(CASE WHEN payment_method = 'cash' THEN 1 END) AS cash_count
-            ")
+            ->whereBetween('created_at', [$prevStartDate, $endDate])
+            ->selectRaw(
+                "
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? THEN total_amount ELSE 0 END), 0) AS total_revenue,
+                COUNT(CASE WHEN created_at BETWEEN ? AND ? THEN 1 END) AS total_transactions,
+                COALESCE(AVG(CASE WHEN created_at BETWEEN ? AND ? THEN total_amount END), 0) AS avg_ticket,
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? AND payment_method = 'qris' THEN total_amount ELSE 0 END), 0) AS qris_amount,
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? AND payment_method = 'cash' THEN total_amount ELSE 0 END), 0) AS cash_amount,
+                COUNT(CASE WHEN created_at BETWEEN ? AND ? AND payment_method = 'qris' THEN 1 END) AS qris_count,
+                COUNT(CASE WHEN created_at BETWEEN ? AND ? AND payment_method = 'cash' THEN 1 END) AS cash_count,
+                COALESCE(SUM(CASE WHEN created_at BETWEEN ? AND ? THEN total_amount ELSE 0 END), 0) AS previous_revenue
+                ",
+                [
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $startDate, $endDate,
+                    $prevStartDate, $prevEndDate,
+                ],
+            )
             ->first();
 
         $totalRevenue = (float) ($aggregates->total_revenue ?? 0);
@@ -139,10 +152,7 @@ class SalesReportService
             ->all();
 
         // 3. Perbandingan Periode Sebelumnya (Growth Percentage)
-        $prevRevenue = (float) DB::table('transactions')
-            ->where('status', 'completed')
-            ->whereBetween('created_at', [$prevStartDate, $prevEndDate])
-            ->sum('total_amount');
+        $prevRevenue = (float) ($aggregates->previous_revenue ?? 0);
 
         if ($prevRevenue > 0) {
             $growth = round((($totalRevenue - $prevRevenue) / $prevRevenue) * 100, 1);
@@ -339,13 +349,15 @@ class SalesReportService
 
         $rows = DB::table('transaction_items as ti')
             ->join('transactions as t', 't.id', '=', 'ti.transaction_id')
+            ->leftJoin('products as p', 'p.id', '=', 'ti.product_id')
+            ->leftJoin('categories as c', 'c.id', '=', 'p.category_id')
             ->where('t.status', 'completed')
             ->whereBetween('t.created_at', [$startDate, $endDate])
-            ->whereNotNull('ti.category_name')
-            ->groupBy('ti.category_name')
+            ->whereRaw("COALESCE(NULLIF(ti.category_name, ''), c.name) IS NOT NULL")
+            ->groupByRaw("COALESCE(NULLIF(ti.category_name, ''), c.name)")
             ->orderByDesc('total_qty')
             ->select([
-                'ti.category_name',
+                DB::raw("COALESCE(NULLIF(ti.category_name, ''), c.name) as category_name"),
                 DB::raw('SUM(ti.quantity) as total_qty'),
             ])
             ->get();
