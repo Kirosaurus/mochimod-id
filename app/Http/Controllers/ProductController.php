@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -19,17 +20,10 @@ class ProductController extends Controller
                             ->latest()
                             ->get();
 
-        $categories = Product::orderBy("name")
+        $categories = Category::orderBy("name")
                                 ->get();
 
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Data produk dan kategori berhasil diambil',
-        //     'products' => $products,
-        //     'categories' => $categories
-        // ], 200);
-
-        return Inertia::render('product/index', [
+        return Inertia::render('stock-management', [
             'products' => $products,
             'categories' => $categories
         ]);
@@ -56,7 +50,7 @@ class ProductController extends Controller
 
         Product::create($data);
 
-        return redirect()->route('products.index');
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan.');
     }
 
     /**
@@ -85,13 +79,15 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
-                $data['image'] = $request->file('image')->store('products', 'public');
             }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            unset($data['image']);
         }
 
-        Product::update($data);
+        $product->update($data);
 
-        return redirect()->route('products.index');
+        return redirect()->back()->with('success', 'Produk berhasil diperbarui.');
     }
 
     /**
@@ -105,6 +101,6 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index');
+        return redirect()->back()->with('success', 'Produk berhasil dihapus.');
     }
 }

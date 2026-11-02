@@ -21,3 +21,5 @@ export interface CartItem{
     product: Product,
     quantity: number
 }
+
+export type StockStatusFilter = 'all' | 'safe' | 'low' | 'out';
