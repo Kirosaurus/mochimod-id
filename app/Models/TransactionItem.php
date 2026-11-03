@@ -13,7 +13,8 @@ use Override;
     'product_name',
     'product_price',
     'quantity',
-    'subtotal'
+    'subtotal',
+    'category_name'
 )]
 class TransactionItem extends Model
 {
