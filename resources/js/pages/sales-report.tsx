@@ -32,10 +32,53 @@ type CategorySales = {
     categories: Array<{ name: string; qty: number; percentage: number }>;
 };
 
+type TransactionHistoryItem = {
+    id: number;
+    transaction_code: string;
+    payment_method: 'cash' | 'qris';
+    total_amount: number | string;
+    status: string;
+    created_at: string;
+    items: Array<{
+        id: number;
+        transaction_id: number;
+        product_name: string;
+        quantity: number;
+    }>;
+};
+
+type HistoryPagination = {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page: number;
+    from: number | null;
+    to: number | null;
+    data: TransactionHistoryItem[];
+};
+
 const periodLabels: Record<Period, string> = {
     daily: 'Harian',
     weekly: 'Mingguan',
     monthly: 'Bulanan',
+};
+
+const formatDateTime = (dateStr: string) => {
+    try {
+        const d = new Date(dateStr);
+        return (
+            new Intl.DateTimeFormat('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Jakarta',
+            }).format(d) + ' WIB'
+        );
+    } catch {
+        return dateStr;
+    }
 };
 
 const formatCurrency = (value: number) =>
@@ -96,6 +139,17 @@ export default function SalesReport() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // History states
+    const [history, setHistory] = useState<HistoryPagination | null>(null);
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [historySearch, setHistorySearch] = useState('');
+    const [historyPage, setHistoryPage] = useState(1);
+
+    const handlePeriodChange = (newPeriod: Period) => {
+        setPeriod(newPeriod);
+        setHistoryPage(1);
+    };
+
     useEffect(() => {
         const controller = new AbortController();
         let isFirstLoad = true;
@@ -130,6 +184,19 @@ export default function SalesReport() {
                 setCategories(summaryData.category_sales);
                 setChart(chartData);
                 setError(null);
+
+                // Refresh history page 1 quietly if not actively searching
+                if (historyPage === 1 && !historySearch.trim()) {
+                    void fetch(`/laporan-penjualan/history?period=${period}&page=1`, {
+                        signal: controller.signal,
+                        headers: { Accept: 'application/json' },
+                    })
+                        .then((res) => (res.ok ? res.json() : null))
+                        .then((data) => {
+                            if (data) setHistory(data);
+                        })
+                        .catch(() => {});
+                }
             } catch (requestError) {
                 if (
                     requestError instanceof Error &&
@@ -176,7 +243,57 @@ export default function SalesReport() {
                 handleVisibilityChange,
             );
         };
-    }, [period]);
+    }, [period, historyPage, historySearch]);
+
+    // Effect for loading transaction history with debounced search
+    useEffect(() => {
+        const controller = new AbortController();
+        let isCancelled = false;
+
+        const timer = setTimeout(async () => {
+            setHistoryLoading(true);
+            try {
+                const queryParams = new URLSearchParams({
+                    period,
+                    page: historyPage.toString(),
+                });
+                if (historySearch.trim()) {
+                    queryParams.set('search', historySearch.trim());
+                }
+
+                const response = await fetch(
+                    `/laporan-penjualan/history?${queryParams.toString()}`,
+                    {
+                        signal: controller.signal,
+                        headers: { Accept: 'application/json' },
+                    },
+                );
+
+                if (!response.ok) {
+                    throw new Error('Gagal memuat riwayat transaksi.');
+                }
+
+                const data = await response.json();
+                if (!isCancelled) {
+                    setHistory(data);
+                }
+            } catch (err) {
+                if (err instanceof Error && err.name !== 'AbortError') {
+                    console.error('Error fetching transaction history:', err);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setHistoryLoading(false);
+                }
+            }
+        }, 300);
+
+        return () => {
+            isCancelled = true;
+            controller.abort();
+            clearTimeout(timer);
+        };
+    }, [period, historyPage, historySearch]);
 
     const values = chart?.datasets[0]?.data ?? [];
     const maxValue = Math.max(...values, 1);
@@ -215,7 +332,7 @@ export default function SalesReport() {
                                     <button
                                         key={item}
                                         type="button"
-                                        onClick={() => setPeriod(item)}
+                                        onClick={() => handlePeriodChange(item)}
                                         className={`flex-1 rounded-lg px-2 py-2 text-xs font-bold transition sm:flex-none sm:px-3 ${
                                             period === item
                                                 ? 'bg-[#f3904f] text-white shadow-sm'
@@ -389,6 +506,178 @@ export default function SalesReport() {
                             </div>
                         </section>
                     </div>
+
+                    {/* Riwayat Transaksi Section */}
+                    <section className="mt-5 rounded-2xl border border-[#eeeae7] bg-white p-4 sm:p-6 shadow-[0_3px_15px_rgba(39,52,84,0.03)]">
+                        <div className="flex flex-col gap-3 border-b border-[#f0eeec] pb-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 className="text-sm font-extrabold text-[#3b4371] sm:text-base">
+                                    Riwayat Transaksi {periodLabels[period]}
+                                </h2>
+                                <p className="mt-0.5 text-xs text-[#8b8987]">
+                                    Daftar rincian struk transaksi yang berhasil diselesaikan ({history?.total ?? 0} transaksi).
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Cari kode / nama menu..."
+                                        value={historySearch}
+                                        onChange={(e) => {
+                                            setHistorySearch(e.target.value);
+                                            setHistoryPage(1);
+                                        }}
+                                        className="w-full rounded-xl border border-[#dedbd8] bg-[#faf9f7] px-3 py-1.5 pl-8 pr-7 text-xs text-[#3b4371] placeholder-[#aaa6a2] focus:border-[#f3904f] focus:bg-white focus:outline-none sm:w-64"
+                                    />
+                                    <svg
+                                        className="absolute left-2.5 top-2 h-3.5 w-3.5 text-[#aaa6a2]"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                        />
+                                    </svg>
+                                    {historySearch && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setHistorySearch('');
+                                                setHistoryPage(1);
+                                            }}
+                                            className="absolute right-2.5 top-1.5 text-xs text-[#aaa6a2] hover:text-[#3b4371]"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Table */}
+                        <div className="mt-4 overflow-x-auto no-scrollbar">
+                            <table className="w-full border-collapse text-left text-xs">
+                                <thead>
+                                    <tr className="border-b border-[#f0eeec] bg-[#faf9f7] text-[11px] font-bold text-[#8b8987] uppercase tracking-wider">
+                                        <th className="py-3 px-4 text-center w-12">No</th>
+                                        <th className="py-3 px-4">Kode Transaksi</th>
+                                        <th className="py-3 px-4">Waktu (WIB)</th>
+                                        <th className="py-3 px-4 text-center">Metode</th>
+                                        <th className="py-3 px-4">Item Pembelian</th>
+                                        <th className="py-3 px-4 text-right">Total Tagihan</th>
+                                        <th className="py-3 px-4 text-center w-28">Struk</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#f5f4f2] text-xs">
+                                    {historyLoading ? (
+                                        <tr>
+                                            <td colSpan={7} className="py-12 text-center text-[#8b8987]">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#f3904f] border-t-transparent" />
+                                                    <span>Memuat data transaksi...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : !history?.data.length ? (
+                                        <tr>
+                                            <td colSpan={7} className="py-12 text-center text-[#8b8987]">
+                                                <div className="flex flex-col items-center justify-center gap-1">
+                                                    <span className="text-2xl">📋</span>
+                                                    <p className="font-semibold text-[#55514d]">
+                                                        Belum ada transaksi pada periode ini
+                                                    </p>
+                                                    <p className="text-[11px] text-[#aaa6a2]">
+                                                        Transaksi yang diselesaikan kasir akan muncul di sini secara otomatis.
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        history.data.map((trx, index) => {
+                                            const rowNumber = (history.current_page - 1) * history.per_page + index + 1;
+                                            const isCash = trx.payment_method?.toLowerCase() === 'cash';
+
+                                            return (
+                                                <tr key={trx.id} className="transition-colors hover:bg-[#faf9f7]">
+                                                    <td className="py-3 px-4 text-center text-[#8b8987]">{rowNumber}</td>
+                                                    <td className="py-3 px-4 font-bold text-[#3b4371]">
+                                                        {trx.transaction_code}
+                                                    </td>
+                                                    <td className="py-3 px-4 whitespace-nowrap text-[#55514d]">
+                                                        {formatDateTime(trx.created_at)}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-center">
+                                                        <span
+                                                            className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold ${
+                                                                isCash
+                                                                    ? 'bg-[#fff4e8] text-[#f3904f] border border-[#ffe3cc]'
+                                                                    : 'bg-[#eef1ff] text-[#3b4371] border border-[#dbe2ff]'
+                                                            }`}
+                                                        >
+                                                            {isCash ? 'Tunai' : 'QRIS'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-4 max-w-xs truncate text-[#55514d]" title={trx.items?.map((it) => `${it.quantity}x ${it.product_name}`).join(', ')}>
+                                                        {trx.items && trx.items.length > 0
+                                                            ? trx.items.map((it) => `${it.quantity}x ${it.product_name}`).join(', ')
+                                                            : '-'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-right font-extrabold text-[#3b4371]">
+                                                        {formatCurrency(Number(trx.total_amount))}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-center">
+                                                        <a
+                                                            href={`/checkout/${trx.id}/receipt/pdf`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="inline-flex items-center gap-1 rounded-lg border border-[#dedbd8] px-2 py-1 text-[11px] font-semibold text-[#55514d] hover:border-[#f3904f] hover:text-[#f3904f] transition"
+                                                        >
+                                                            <span>📄 Nota</span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination footer */}
+                        {history && history.last_page > 1 && (
+                            <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-[#f0eeec] pt-3 sm:flex-row text-xs text-[#8b8987]">
+                                <div>
+                                    Menampilkan {history.from ?? 0} - {history.to ?? 0} dari {history.total} transaksi
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        disabled={history.current_page <= 1 || historyLoading}
+                                        onClick={() => setHistoryPage((p) => Math.max(p - 1, 1))}
+                                        className="rounded-lg border border-[#dedbd8] px-3 py-1 font-bold text-[#55514d] hover:border-[#f3904f] hover:text-[#f3904f] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    >
+                                        Sebelumnya
+                                    </button>
+                                    <span className="px-2 font-semibold text-[#3b4371]">
+                                        {history.current_page} / {history.last_page}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        disabled={history.current_page >= history.last_page || historyLoading}
+                                        onClick={() => setHistoryPage((p) => Math.min(p + 1, history.last_page))}
+                                        className="rounded-lg border border-[#dedbd8] px-3 py-1 font-bold text-[#55514d] hover:border-[#f3904f] hover:text-[#f3904f] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    >
+                                        Berikutnya
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </section>
                 </section>
             </main>
         </>

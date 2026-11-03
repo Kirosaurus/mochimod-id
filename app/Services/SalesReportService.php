@@ -440,7 +440,7 @@ class SalesReportService
         if (Cache::supportsTags()) {
             Cache::tags(['sales_report'])->flush();
         } else {
-            Cache::increment('sales_report_version');
+            Cache::forever('sales_report_version', (string) microtime(true));
         }
     }
 }

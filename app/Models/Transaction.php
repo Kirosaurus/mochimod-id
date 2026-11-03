@@ -44,7 +44,7 @@ class Transaction extends Model
     // Generate Code
     public static function generateCode(): string
     {
-        $prefix = 'TRX-' . date('Ymd') . '-';
+        $prefix = 'TRX-' . now()->format('Ymd') . '-';
         $lastTransaction = self::where('transaction_code', 'like', $prefix . '%')
             ->orderByDesc('id')
             ->first();
