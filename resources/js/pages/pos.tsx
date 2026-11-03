@@ -35,10 +35,10 @@ export default function Pos({ products, categories }: props) {
             <Head title="POS Order - Mochimod" />
 
             <main>
-                <div className="min-h-[calc(100vh-64px)] w-full p-3 sm:p-4">
-                    <div className="flex min-h-[calc(100vh-88px)] flex-col gap-4 lg:flex-row">
-                        <div className="flex min-w-0 flex-1 flex-col gap-3">
-                            <div className="flex w-full items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
+                <div className="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] lg:overflow-hidden w-full p-3 sm:p-4">
+                    <div className="flex min-h-[calc(100vh-88px)] lg:h-full lg:min-h-0 flex-col gap-4 lg:flex-row">
+                        <div className="flex min-w-0 flex-1 flex-col gap-3 lg:h-full lg:min-h-0">
+                            <div className="flex w-full shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
                                 <div
                                     className={`w-full relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#374272] bg-[#F8FAFC] duration-300 ease-in-out`}
                                 >
@@ -90,7 +90,7 @@ export default function Pos({ products, categories }: props) {
                                 </div>
                                 {/* Search bar dan toolbar lainnya */}
                             </div>
-                            <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
+                            <div className="no-scrollbar flex shrink-0 items-center gap-2 overflow-x-auto pb-1">
                                 {/* Tombol "Semua Kategori" */}
                                 <button
                                     type="button"
@@ -123,9 +123,11 @@ export default function Pos({ products, categories }: props) {
                                 ))
                                 }
                             </div>
-                            <ProductGrid products={filtered} onAdd={addItem} />
+                            <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+                                <ProductGrid products={filtered} onAdd={addItem} />
+                            </div>
                         </div>
-                        <div className="flex min-h-[420px] w-full min-w-0 flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:min-h-[460px] lg:h-[calc(100vh-88px)] lg:w-[360px] lg:shrink-0 lg:p-4 xl:w-[395px]">
+                        <div className="flex min-h-[420px] w-full min-w-0 flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:min-h-[460px] lg:h-full lg:min-h-0 lg:w-[360px] lg:shrink-0 lg:p-4 xl:w-[395px]">
                             <CartPanel
                                 items={items}
                                 subtotal={subTotal}
