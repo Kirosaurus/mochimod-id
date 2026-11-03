@@ -26,27 +26,15 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('mochimod123'),
         ]);
 
-        $category = Category::create([
-            'name' => 'Mochi',
-            'description' => 'Produk mochi',
-        ]);
+        $categories = collect(['Mochi', 'Jus'])->map(function ($name) {
+            return Category::create([
+                'name' => $name,
+                'description' => "Aneka menu varian {$name}"
+            ]);
+        });
 
-        Product::create([
-            'category_id' => $category->id,
-            'name' => 'Mochi Cokelat',
-            'stock' => 20,
-            'price' => 15000,
-            'image' => null,
-            'is_active' => true,
-        ]);
-
-        Product::create([
-            'category_id' => $category->id,
-            'name' => 'Mochi Stroberi',
-            'stock' => 15,
-            'price' => 12000,
-            'image' => null,
-            'is_active' => true,
+        Product::factory(50)->create([
+            'category_id' => fn () => $categories->random()->id
         ]);
     }
 }
