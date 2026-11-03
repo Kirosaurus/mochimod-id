@@ -22,9 +22,6 @@ Route::middleware('auth')->group(function () {
         ->except('create', 'show', 'edit');
     Route::get('/manajemen-stok', fn () => redirect()->route('products.index'));
 
-    // Route for Sale Report
-    Route::get('/laporan-penjualan', [SalesReportController::class, 'show'])->name('Sales Report');
-
     // Route for Logout
     Route::post('/logout', function () {
         Auth::logout();
