@@ -1,96 +1,56 @@
-# Mochimod ID
+# Mochimod ID — Aplikasi POS
 
-Aplikasi web berbasis Laravel untuk Mochimod ID. Saat ini aplikasi menyediakan halaman login dan dashboard untuk pengguna yang sudah terautentikasi.
+Aplikasi Point of Sale (POS) berbasis web untuk UMKM **Mochimod**, penjual mochi dan jus. Dibangun menggunakan Laravel 13, Inertia.js, React, dan TypeScript.
 
-## Teknologi
+## Fitur Utama
 
-- PHP 8.3+
-- Laravel 13
-- Livewire 4
-- Vite 8
-- Tailwind CSS 4
-- SQLite sebagai database default untuk development
+- 🛒 **Point of Sale** — Tambah produk ke keranjang dan proses transaksi dengan cepat
+- 💳 **Pembayaran** — Mendukung tunai dan QRIS statis
+- 🧾 **Struk Digital** — Tampil di browser dan bisa diunduh sebagai PDF
+- 📦 **Manajemen Produk & Stok** — CRUD produk lengkap dengan upload gambar
+- 📊 **Laporan Penjualan** — Ringkasan, grafik tren, riwayat transaksi, dan ekspor PDF
 
-## Instalasi
+## Tech Stack
 
-Pastikan PHP, Composer, dan Node.js sudah terpasang.
+| Layer | Teknologi |
+|---|---|
+| Backend | PHP 8.3+, Laravel 13, Inertia.js |
+| Frontend | React 19, TypeScript, Tailwind CSS v4, Vite 8 |
+| Database | MySQL (production) / SQLite (development) |
+| PDF | barryvdh/laravel-dompdf |
+| Testing | Pest PHP |
+
+## Quick Start
 
 ```bash
 git clone <url-repository>
-cd Mochimod-Id
+cd mochimod-id
 composer run setup
-```
-
-`composer run setup` akan memasang dependency, membuat `.env`, membuat application key, menjalankan migration, memasang dependency JavaScript, dan melakukan build asset.
-
-Jika ingin menjalankan langkahnya satu per satu:
-
-```bash
-composer install
-copy .env.example .env
-php artisan key:generate
-php artisan migrate
-npm install
-npm run build
-```
-
-## Menjalankan Aplikasi
-
-Untuk menjalankan server Laravel dan Vite secara bersamaan:
-
-```bash
 composer run dev
 ```
 
-Aplikasi biasanya tersedia di `http://localhost:8000`.
+Aplikasi berjalan di `http://localhost:8000`. Login dengan:
+- **Email:** `admin@mochimod.id`
+- **Password:** `mochimod123`
 
-Untuk menjalankan Vite saja:
+## Dokumentasi Lengkap
 
-```bash
-npm run dev
-```
+Semua dokumentasi tersedia di folder [`docs/`](./docs/):
 
-## Testing
+| Dokumen | Keterangan |
+|---|---|
+| [01 — Gambaran Umum](./docs/01-overview.md) | Konteks bisnis dan fitur |
+| [02 — Tech Stack](./docs/02-tech-stack.md) | Teknologi yang digunakan |
+| [03 — Getting Started](./docs/03-getting-started.md) | Instalasi dan menjalankan project |
+| [04 — Arsitektur](./docs/04-architecture.md) | Struktur dan alur request |
+| [05 — Database](./docs/05-database.md) | Skema database dan relasi model |
+| [06 — Fitur Aplikasi](./docs/06-features.md) | Detail setiap fitur |
+| [07 — Routes](./docs/07-routes.md) | Daftar semua route |
+| [08 — Frontend](./docs/08-frontend.md) | Panduan React + Inertia |
+| [09 — Konfigurasi Environment](./docs/09-environment.md) | Panduan variabel `.env` |
+| [10 — Testing](./docs/10-testing.md) | Cara menjalankan dan menulis test |
+| [11 — Kontribusi](./docs/11-contributing.md) | Konvensi kode dan alur Git |
 
-```bash
-composer test
-```
+## Lisensi
 
-Atau:
-
-```bash
-php artisan test
-```
-
-## Alur Git dengan Branch Sendiri
-
-Buat branch pribadi dari branch utama, misalnya `feature/nama-fitur`:
-
-```bash
-git switch main
-git pull origin main
-git switch -c feature/nama-fitur
-```
-
-Setelah selesai mengerjakan perubahan:
-
-```bash
-git status
-git add .
-git commit -m "feat: jelaskan perubahan"
-git push -u origin feature/nama-fitur
-```
-
-Perintah `-u` menghubungkan branch lokal dengan branch di GitHub. Push berikutnya cukup menggunakan:
-
-```bash
-git push
-```
-
-Setelah branch berhasil dikirim, buka repository di GitHub lalu buat Pull Request dari `feature/nama-fitur` ke `main`.
-
-## Catatan
-
-- Jangan commit file `.env` karena berisi konfigurasi lokal dan data rahasia.
-- Sebelum commit, periksa perubahan dengan `git status` dan `git diff`.
-- Gunakan nama branch yang menjelaskan pekerjaan, misalnya `feature/login`, `fix/session`, atau `docs/readme`.
+Project ini dibuat untuk keperluan akademik UMKM Mochimod.
