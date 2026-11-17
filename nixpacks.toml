@@ -4,6 +4,9 @@
 NIXPACKS_PHP_ROOT_DIR = "/app/public"
 NODE_ENV = "production"
 
+[phases.setup]
+nixPkgs = ["php84", "php84Packages.composer", "nodejs_22"]
+
 [phases.install]
 cmds = [
     "composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction",
