@@ -27,6 +27,7 @@ export default function ProductGrid({ products, onAdd }: props) {
         );
     }
 
+    console.log(products);
     return (
         <div className="w-full overflow-x-auto no-scrollbar">
             <div className="grid grid-flow-row grid-cols-6 auto-rows-auto gap-4 p-[2px]">
@@ -49,8 +50,11 @@ export default function ProductGrid({ products, onAdd }: props) {
                                     alt={product.name}
                                     className="w-full h-full object-cover"
                                     onError={(event) => {
-                                        event.currentTarget.style.display = "none";
-                                        event.currentTarget.parentElement?.classList.add("bg-orange-50");
+                                        event.currentTarget.style.display =
+                                            "none";
+                                        event.currentTarget.parentElement?.classList.add(
+                                            "bg-orange-50",
+                                        );
                                     }}
                                 />
                             </div>
@@ -71,9 +75,14 @@ export default function ProductGrid({ products, onAdd }: props) {
                             <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
                             <div className="flex flex-row gap-[14px] justify-between">
                                 <div className="flex flex-col text-left">
-                                    <p className="text-small text-slate-500">Harga</p>
+                                    <p className="text-small text-slate-500">
+                                        Harga
+                                    </p>
                                     <p className="text-normal font-bold text-nowrap text-slate-800">
-                                        Rp {Math.floor(Number(product.price)).toLocaleString("id-ID")}
+                                        Rp{" "}
+                                        {Math.floor(
+                                            Number(product.price),
+                                        ).toLocaleString("id-ID")}
                                     </p>
                                 </div>
                             </div>

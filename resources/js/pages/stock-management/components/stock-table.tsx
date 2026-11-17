@@ -38,7 +38,7 @@ export default function StockTable({
             stockColor: "text-slate-800",
         };
     };
-
+    console.log(products);
     return (
         <div className="w-full bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
@@ -51,7 +51,9 @@ export default function StockTable({
                             <th className="py-4 px-6">HARGA JUAL</th>
                             <th className="py-4 px-6 text-center">STOK</th>
                             <th className="py-4 px-6 text-center">STATUS</th>
-                            <th className="py-4 px-6 text-center">AKSI CEPAT UPDATE</th>
+                            <th className="py-4 px-6 text-center">
+                                AKSI CEPAT UPDATE
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-sm">
@@ -70,10 +72,16 @@ export default function StockTable({
                                             strokeWidth="1.5"
                                         >
                                             <circle cx="12" cy="12" r="10" />
-                                            <line x1="8" y1="12" x2="16" y2="12" />
+                                            <line
+                                                x1="8"
+                                                y1="12"
+                                                x2="16"
+                                                y2="12"
+                                            />
                                         </svg>
                                         <p className="font-medium text-slate-500">
-                                            Tidak ada produk yang sesuai kriteria pencarian
+                                            Tidak ada produk yang sesuai
+                                            kriteria pencarian
                                         </p>
                                     </div>
                                 </td>
@@ -81,7 +89,7 @@ export default function StockTable({
                         ) : (
                             products.map((product) => {
                                 const status = getStockStatus(product.stock);
-
+                                console.log(product.image);
                                 return (
                                     <tr
                                         key={product.id}
@@ -93,7 +101,9 @@ export default function StockTable({
                                                 {product.image ? (
                                                     <img
                                                         src={
-                                                            product.image.startsWith("http")
+                                                            product.image.startsWith(
+                                                                "/",
+                                                            )
                                                                 ? product.image
                                                                 : `/storage/${product.image}`
                                                         }
@@ -101,10 +111,11 @@ export default function StockTable({
                                                         className="w-full h-full object-cover rounded-lg"
                                                         onError={(e) => {
                                                             // Fallback to placeholder if image load fails
-                                                            e.currentTarget.style.display = "none";
+                                                            e.currentTarget.style.display =
+                                                                "none";
                                                             e.currentTarget.parentElement?.classList.add(
                                                                 "bg-orange-50",
-                                                                "text-orange-500"
+                                                                "text-orange-500",
                                                             );
                                                         }}
                                                     />
@@ -124,7 +135,8 @@ export default function StockTable({
                                         {/* KATEGORI (Badge seragam & menyatu dengan kolom) */}
                                         <td className="py-3 px-6 text-center">
                                             <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200/70">
-                                                {product.category?.name || "Umum"}
+                                                {product.category?.name ||
+                                                    "Umum"}
                                             </span>
                                         </td>
 
@@ -160,7 +172,9 @@ export default function StockTable({
                                                 {/* Edit Button */}
                                                 <button
                                                     type="button"
-                                                    onClick={() => onEdit(product)}
+                                                    onClick={() =>
+                                                        onEdit(product)
+                                                    }
                                                     className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
                                                     title="Edit Produk"
                                                 >
@@ -181,7 +195,9 @@ export default function StockTable({
                                                 {/* Delete Button */}
                                                 <button
                                                     type="button"
-                                                    onClick={() => onDelete(product)}
+                                                    onClick={() =>
+                                                        onDelete(product)
+                                                    }
                                                     className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                                                     title="Hapus Produk"
                                                 >
@@ -196,8 +212,18 @@ export default function StockTable({
                                                     >
                                                         <polyline points="3 6 5 6 21 6" />
                                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                        <line x1="10" y1="11" x2="10" y2="17" />
-                                                        <line x1="14" y1="11" x2="14" y2="17" />
+                                                        <line
+                                                            x1="10"
+                                                            y1="11"
+                                                            x2="10"
+                                                            y2="17"
+                                                        />
+                                                        <line
+                                                            x1="14"
+                                                            y1="11"
+                                                            x2="14"
+                                                            y2="17"
+                                                        />
                                                     </svg>
                                                 </button>
                                             </div>
