@@ -1,0 +1,16 @@
+.git
+.github
+.vscode
+.env
+.env.*
+!.env.example
+node_modules
+vendor
+storage/logs
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+database/database.sqlite
+public/hot
+public/build

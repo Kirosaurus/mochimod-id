@@ -139,6 +139,47 @@ npm run dev
 
 Aplikasi tersedia di `http://localhost:8000`.
 
+## Deploy ke Railway
+
+Repository ini sudah menyediakan `railway.toml`. Railway akan menjalankan
+Composer, `npm ci`, build Vite, migrasi database, lalu menjalankan Laravel pada
+port yang diberikan Railway.
+
+1. Buat project baru di Railway dan deploy repository GitHub ini.
+2. Tambahkan service **MySQL** di project yang sama.
+3. Pada service aplikasi, isi variable berikut:
+
+   ```env
+   APP_NAME=Mochimod ID
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_KEY=base64:<hasil php artisan key:generate --show>
+   APP_URL=https://<domain-Railway-anda>
+   LOG_LEVEL=error
+   DB_CONNECTION=mysql
+   DB_HOST=${{MySQL.MYSQLHOST}}
+   DB_PORT=${{MySQL.MYSQLPORT}}
+   DB_DATABASE=${{MySQL.MYSQLDATABASE}}
+   DB_USERNAME=${{MySQL.MYSQLUSER}}
+   DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+   SESSION_DRIVER=database
+   CACHE_STORE=database
+   QUEUE_CONNECTION=database
+   FILESYSTEM_DISK=public
+   QRIS_MERCHANT_ID=<NMID-QRIS-anda>
+   ```
+
+   Ganti `MySQL` jika nama service database Anda berbeda. `APP_KEY` harus
+   dibuat sekali dan jangan diganti setelah aplikasi menyimpan data terenkripsi.
+4. Generate domain publik dari menu **Settings → Networking → Generate Domain**,
+   lalu masukkan URL tersebut sebagai `APP_URL`.
+5. Setelah deploy pertama, jalankan `php artisan db:seed --force` dari Railway
+   Shell jika ingin membuat akun admin dan produk awal. Ganti password default
+   setelah login.
+
+Jangan mengisi `APP_KEY`, password database, atau kredensial Midtrans/QRIS di
+repository. Simpan semuanya sebagai Variables di Railway.
+
 ---
 
 ## Default Credentials

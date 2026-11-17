@@ -1,0 +1,10 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader && npm ci && npm run build"
+
+[deploy]
+startCommand = "php artisan migrate --force && php artisan optimize && php artisan serve --host=0.0.0.0 --port=$PORT"
+healthcheckPath = "/up"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
