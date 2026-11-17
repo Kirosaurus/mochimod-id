@@ -1,0 +1,19 @@
+# nixpacks.toml — Konfigurasi build & deployment Railway untuk Mochimod ID
+
+[variables]
+NIXPACKS_PHP_ROOT_DIR = "/app/public"
+NODE_ENV = "production"
+
+[phases.install]
+cmds = [
+    "composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction",
+    "npm ci"
+]
+
+[phases.build]
+cmds = [
+    "npm run build"
+]
+
+[start]
+cmd = "php artisan storage:link --force && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && /start.sh"
