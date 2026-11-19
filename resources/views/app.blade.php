@@ -4,9 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.png" type="image/png">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="/favicon.ico?v=20261119" sizes="any">
+        <link rel="icon" href="/favicon.png?v=20261119" type="image/png">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261119">
 
         @fonts
 
