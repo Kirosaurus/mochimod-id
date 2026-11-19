@@ -1,0 +1,109 @@
+name: Deploy Alwaysdata
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - deploy2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install and build frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure SSH
+        env:
+          ALWAYSDATA_SSH_KEY: ${{ secrets.ALWAYSDATA_SSH_KEY }}
+          ALWAYSDATA_SSH_PASSWORD: ${{ secrets.ALWAYSDATA_SSH_PASSWORD }}
+          ALWAYSDATA_SSH_HOST: ${{ secrets.ALWAYSDATA_SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          SSH_HOST="$ALWAYSDATA_SSH_HOST"
+
+          if [[ "$SSH_HOST" != ssh-*.* ]]; then
+            SSH_HOST="ssh-${SSH_HOST}"
+          fi
+
+          if ! ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
+            echo "Unable to reach SSH host: $SSH_HOST" >&2
+            exit 1
+          fi
+
+          echo "ALWAYSDATA_SSH_HOST=$SSH_HOST" >> "$GITHUB_ENV"
+
+          if [ -n "$ALWAYSDATA_SSH_KEY" ]; then
+            printf '%s\n' "$ALWAYSDATA_SSH_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+            echo "DEPLOY_AUTH=key" >> "$GITHUB_ENV"
+          elif [ -n "$ALWAYSDATA_SSH_PASSWORD" ]; then
+            sudo apt-get update
+            sudo apt-get install -y rsync sshpass
+            echo "DEPLOY_AUTH=password" >> "$GITHUB_ENV"
+          else
+            echo "ALWAYSDATA_SSH_KEY or ALWAYSDATA_SSH_PASSWORD must be configured." >&2
+            exit 1
+          fi
+
+      - name: Sync files
+        env:
+          ALWAYSDATA_SSH_PASSWORD: ${{ secrets.ALWAYSDATA_SSH_PASSWORD }}
+          ALWAYSDATA_SSH_USER: ${{ secrets.ALWAYSDATA_SSH_USER }}
+          ALWAYSDATA_REMOTE_PATH: ${{ secrets.ALWAYSDATA_REMOTE_PATH }}
+        run: |
+          if [ "$DEPLOY_AUTH" = "key" ]; then
+            SSH_COMMAND="ssh -i ~/.ssh/deploy_key -o BatchMode=yes"
+          else
+            SSH_COMMAND='sshpass -e ssh -o StrictHostKeyChecking=accept-new'
+            export SSHPASS="$ALWAYSDATA_SSH_PASSWORD"
+          fi
+
+          rsync -rltvz --delete \
+            --omit-dir-times \
+            --no-perms \
+            --no-owner \
+            --no-group \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='vendor/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='database/*.sqlite*' \
+            --exclude='storage/' \
+            --exclude='storage/logs/*.log' \
+            --exclude='public/hot' \
+            --exclude='public/storage' \
+            --exclude='bootstrap/cache/*.php' \
+            -e "$SSH_COMMAND" \
+            ./ "$ALWAYSDATA_SSH_USER@$ALWAYSDATA_SSH_HOST:$ALWAYSDATA_REMOTE_PATH/"
+
+      - name: Run Laravel deploy commands
+        env:
+          ALWAYSDATA_SSH_PASSWORD: ${{ secrets.ALWAYSDATA_SSH_PASSWORD }}
+          ALWAYSDATA_SSH_USER: ${{ secrets.ALWAYSDATA_SSH_USER }}
+          ALWAYSDATA_REMOTE_PATH: ${{ secrets.ALWAYSDATA_REMOTE_PATH }}
+        run: |
+          if [ "$DEPLOY_AUTH" = "key" ]; then
+            ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+              "$ALWAYSDATA_SSH_USER@$ALWAYSDATA_SSH_HOST" \
+              "cd '$ALWAYSDATA_REMOTE_PATH' && bash scripts/deploy-alwaysdata.sh"
+          else
+            export SSHPASS="$ALWAYSDATA_SSH_PASSWORD"
+            sshpass -e ssh -o StrictHostKeyChecking=accept-new \
+              "$ALWAYSDATA_SSH_USER@$ALWAYSDATA_SSH_HOST" \
+              "cd '$ALWAYSDATA_REMOTE_PATH' && bash scripts/deploy-alwaysdata.sh"
+          fi
