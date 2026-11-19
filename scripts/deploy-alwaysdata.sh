@@ -13,7 +13,7 @@ fi
 
 composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 php artisan migrate --force
-php artisan storage:link
+php artisan storage:link --force
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
