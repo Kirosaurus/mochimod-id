@@ -17,20 +17,11 @@ export default function TopBar() {
                     href="/"
                     className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none"
                 >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-[#FFA785] to-[#FF8462] text-white shadow-sm shadow-orange-500/20 sm:h-10 sm:w-10">
-                        <svg
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M12 2.25a4.75 4.75 0 0 0-4.75 4.75v2.25H6.5A2.75 2.75 0 0 0 3.75 12v7A2.75 2.75 0 0 0 6.5 21.75h11A2.75 2.75 0 0 0 20.25 19v-7a2.75 2.75 0 0 0-2.75-2.75h-.75V7A4.75 4.75 0 0 0 12 2.25Zm2.75 7V7a4.75 4.75 0 0 0-9.5 0v2.25h9.5ZM12 14a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </span>
+                    <img
+                        src="/mochimod-logo.png"
+                        alt="Logo Mochimod"
+                        className="h-10 w-10 shrink-0 rounded-full object-cover sm:h-12 sm:w-12"
+                    />
                     <span className="truncate text-lg font-bold tracking-tight text-[#273454] sm:text-xl">
                         MOCHI<span className="text-orange-500">MOD</span>
                     </span>
