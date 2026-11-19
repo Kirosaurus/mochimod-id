@@ -3,7 +3,7 @@ import UserPopover from '@/components/user-popover';
 
 const navigationItems = [
     { href: '/', label: 'POS / Kasir' },
-    { href: '/manajemen-stok', label: 'Kelola Stok' },
+    { href: '/manajemen-stok', label: 'Kelola Produk & Stok' },
     { href: '/laporan-penjualan', label: 'Laporan Penjualan' },
 ];
 

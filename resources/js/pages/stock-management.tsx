@@ -132,7 +132,7 @@ export default function StockManagement({
                     {/* Page Header (Judul & Tombol Tambah Produk, Tanpa Deskripsi & Tanpa Export CSV) */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#273454] tracking-tight">
-                            Manajemen Stok & Produk Mochi
+                            Manajemen Produk & Stok Mochi
                         </h1>
 
                         <button

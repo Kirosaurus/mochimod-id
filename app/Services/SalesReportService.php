@@ -347,19 +347,26 @@ class SalesReportService
     {
         [$startDate, $endDate] = $this->resolveDateRange($period, $date);
 
-        $rows = DB::table('transaction_items as ti')
+        $categorySales = DB::table('transaction_items as ti')
             ->join('transactions as t', 't.id', '=', 'ti.transaction_id')
             ->leftJoin('products as p', 'p.id', '=', 'ti.product_id')
             ->leftJoin('categories as c', 'c.id', '=', 'p.category_id')
             ->where('t.status', 'completed')
             ->whereBetween('t.created_at', [$startDate, $endDate])
             ->whereRaw("COALESCE(NULLIF(ti.category_name, ''), c.name) IS NOT NULL")
-            ->groupByRaw("COALESCE(NULLIF(ti.category_name, ''), c.name)")
-            ->orderByDesc('total_qty')
             ->select([
                 DB::raw("COALESCE(NULLIF(ti.category_name, ''), c.name) as category_name"),
-                DB::raw('SUM(ti.quantity) as total_qty'),
+                'ti.quantity',
+            ]);
+
+        $rows = DB::query()
+            ->fromSub($categorySales, 'category_sales')
+            ->select([
+                'category_name',
+                DB::raw('SUM(quantity) as total_qty'),
             ])
+            ->groupBy('category_name')
+            ->orderByDesc('total_qty')
             ->get();
 
         $totalQty = (int) $rows->sum('total_qty');

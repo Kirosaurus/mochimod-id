@@ -29,15 +29,15 @@ export default function ProductGrid({ products, onAdd }: props) {
 
     return (
         <div className="w-full overflow-x-auto no-scrollbar">
-            <div className="grid grid-flow-row grid-cols-6 auto-rows-auto gap-4 p-[2px]">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 p-[2px] sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] sm:gap-4">
                 {products.map((product) => (
                     <button
                         key={product.id}
                         onClick={() => onAdd(product)}
-                        className="flex flex-col w-full h-auto bg-white rounded-[12px] p-[12px] border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent cursor-pointer duration-300 ease-in-out"
+                        className="flex h-full min-w-0 flex-col justify-between w-full bg-white rounded-[12px] p-2.5 sm:p-[12px] text-left border border-gray-200 shadow-[0px_1px_10px_0px_var(--color-gray-200)] hover:translate-y-[-2px] hover:border-accent active:scale-[0.98] cursor-pointer duration-300 ease-in-out"
                     >
                         <div className="flex flex-col gap-[4px]">
-                            <div className="w-full h-[128px] shrink-0 rounded-[8px] bg-slate-100 overflow-hidden flex items-center justify-center border border-slate-100">
+                            <div className="w-full aspect-[4/3] shrink-0 rounded-[8px] bg-slate-100 overflow-hidden flex items-center justify-center border border-slate-100">
                                 <img
                                     src={
                                         product.image
@@ -49,31 +49,39 @@ export default function ProductGrid({ products, onAdd }: props) {
                                     alt={product.name}
                                     className="w-full h-full object-cover"
                                     onError={(event) => {
-                                        event.currentTarget.style.display = "none";
-                                        event.currentTarget.parentElement?.classList.add("bg-orange-50");
+                                        event.currentTarget.style.display =
+                                            "none";
+                                        event.currentTarget.parentElement?.classList.add(
+                                            "bg-orange-50",
+                                        );
                                     }}
                                 />
                             </div>
-                            <div className="flex flex-row w-fill items-center justify-between">
+                            <div className="flex flex-row w-full items-center justify-between">
                                 <div className="flex flex-row w-auto bg-success-bg rounded-[8px] py-[2px] px-[6px]">
                                     <p className="text-success font-bold text-small">
                                         Stok : {product.stock}
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex h-[75px]">
-                                <p className="font-bold text-normal text-left line-clamp-3">
+                            <div className="flex min-h-[2.75rem] sm:min-h-[4.5rem]">
+                                <p className="font-bold text-sm sm:text-normal text-left line-clamp-2 sm:line-clamp-3">
                                     {product.name}
                                 </p>
                             </div>
                         </div>
                         <div>
                             <div className="h-[1px] bg-gray-200 mb-[8px]"></div>
-                            <div className="flex flex-row gap-[14px] justify-between">
+                            <div className="flex flex-row gap-2 sm:gap-[14px] justify-between">
                                 <div className="flex flex-col text-left">
-                                    <p className="text-small text-slate-500">Harga</p>
-                                    <p className="text-normal font-bold text-nowrap text-slate-800">
-                                        Rp {Math.floor(Number(product.price)).toLocaleString("id-ID")}
+                                    <p className="text-small text-slate-500">
+                                        Harga
+                                    </p>
+                                    <p className="text-sm sm:text-normal font-bold text-nowrap text-slate-800">
+                                        Rp{" "}
+                                        {Math.floor(
+                                            Number(product.price),
+                                        ).toLocaleString("id-ID")}
                                     </p>
                                 </div>
                             </div>
