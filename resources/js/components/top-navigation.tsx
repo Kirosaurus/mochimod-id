@@ -20,7 +20,7 @@ export default function TopBar() {
                     <img
                         src="/mochimod-logo.png"
                         alt="Logo Mochimod"
-                        className="h-10 w-10 shrink-0 rounded-full object-cover sm:h-12 sm:w-12"
+                        className="h-10 w-10 shrink-0 rounded-full object-contain sm:h-12 sm:w-12"
                     />
                     <span className="truncate text-lg font-bold tracking-tight text-[#273454] sm:text-xl">
                         MOCHI<span className="text-orange-500">MOD</span>
