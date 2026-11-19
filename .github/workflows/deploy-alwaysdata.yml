@@ -32,7 +32,18 @@ jobs:
           ALWAYSDATA_SSH_HOST: ${{ secrets.ALWAYSDATA_SSH_HOST }}
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H "$ALWAYSDATA_SSH_HOST" >> ~/.ssh/known_hosts
+          SSH_HOST="$ALWAYSDATA_SSH_HOST"
+
+          if [[ "$SSH_HOST" != ssh-*.* ]]; then
+            SSH_HOST="ssh-${SSH_HOST}"
+          fi
+
+          if ! ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
+            echo "Unable to reach SSH host: $SSH_HOST" >&2
+            exit 1
+          fi
+
+          echo "ALWAYSDATA_SSH_HOST=$SSH_HOST" >> "$GITHUB_ENV"
 
           if [ -n "$ALWAYSDATA_SSH_KEY" ]; then
             printf '%s\n' "$ALWAYSDATA_SSH_KEY" > ~/.ssh/deploy_key
@@ -51,7 +62,6 @@ jobs:
         env:
           ALWAYSDATA_SSH_PASSWORD: ${{ secrets.ALWAYSDATA_SSH_PASSWORD }}
           ALWAYSDATA_SSH_USER: ${{ secrets.ALWAYSDATA_SSH_USER }}
-          ALWAYSDATA_SSH_HOST: ${{ secrets.ALWAYSDATA_SSH_HOST }}
           ALWAYSDATA_REMOTE_PATH: ${{ secrets.ALWAYSDATA_REMOTE_PATH }}
         run: |
           if [ "$DEPLOY_AUTH" = "key" ]; then
@@ -81,7 +91,6 @@ jobs:
         env:
           ALWAYSDATA_SSH_PASSWORD: ${{ secrets.ALWAYSDATA_SSH_PASSWORD }}
           ALWAYSDATA_SSH_USER: ${{ secrets.ALWAYSDATA_SSH_USER }}
-          ALWAYSDATA_SSH_HOST: ${{ secrets.ALWAYSDATA_SSH_HOST }}
           ALWAYSDATA_REMOTE_PATH: ${{ secrets.ALWAYSDATA_REMOTE_PATH }}
         run: |
           if [ "$DEPLOY_AUTH" = "key" ]; then
