@@ -1,6 +1,7 @@
 name: Deploy Alwaysdata
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - deploy2
