@@ -354,7 +354,7 @@ class SalesReportService
             ->where('t.status', 'completed')
             ->whereBetween('t.created_at', [$startDate, $endDate])
             ->whereRaw("COALESCE(NULLIF(ti.category_name, ''), c.name) IS NOT NULL")
-            ->groupByRaw("COALESCE(NULLIF(ti.category_name, ''), c.name)")
+            ->groupBy('ti.category_name', 'c.name')
             ->orderByDesc('total_qty')
             ->select([
                 DB::raw("COALESCE(NULLIF(ti.category_name, ''), c.name) as category_name"),
