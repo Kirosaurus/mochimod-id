@@ -112,7 +112,7 @@ export default function Checkout({
                             {(
                                 [
                                     ["cash", "Tunai / Cash", "Pembayaran di kasir"],
-                                    ["qris", "QRIS Dinamis", "Bayar menggunakan QRIS"],
+                                    ["qris", "QRIS", "Bayar menggunakan QRIS"],
                                 ] as const
                             ).map(([value, label, description]) => (
                                 <label
@@ -194,8 +194,15 @@ export default function Checkout({
                                 )}
                             </div>
                         ) : (
-                            <div className="flex min-h-40 items-center justify-center rounded-xl bg-slate-50 text-center text-sm text-slate-500">
-                                QR code QRIS akan ditampilkan di sini.
+                            <div className="flex flex-col items-center gap-3 rounded-xl bg-slate-50 p-4">
+                                <img
+                                    src="/images/qris.png"
+                                    alt="QR Code QRIS"
+                                    className="w-40 rounded-lg object-contain"
+                                />
+                                <p className="text-xs text-slate-500">
+                                    Scan QR code di atas menggunakan aplikasi dompet digital Anda
+                                </p>
                             </div>
                         )}
 
