@@ -30,7 +30,7 @@ export default function CartPanel({
                 {items.length > 0 && (
                     <button
                         onClick={onClear}
-                        className="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                        className="text-xs text-muted-foreground hover:text-red-500 transition-colors hover:cursor-pointer"
                     >
                         Clear all
                     </button>
@@ -176,7 +176,7 @@ export default function CartPanel({
                                 </div>
                                 <button
                                     onClick={() => onRemove(item.product.id)}
-                                    className="p-1 hover:bg-slate-100 rounded"
+                                    className="p-1 hover:bg-slate-100 rounded hover:cursor-pointer hover:scale-110 ease-in-out duration-300"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -277,7 +277,7 @@ export default function CartPanel({
 
                 <button
                     type="button"
-                    className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
+                    className="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors hover:cursor-pointer"
                     disabled={items.length === 0}
                     onClick={onCheckout}
                 >

@@ -79,9 +79,7 @@ export default function ProductGrid({ products, onAdd }: props) {
                                     </p>
                                     <p className="text-sm sm:text-normal font-bold text-nowrap text-slate-800">
                                         Rp{" "}
-                                        {Math.floor(
-                                            Number(product.price),
-                                        ).toLocaleString("id-ID")}
+                                        {Math.floor(Number(product.price)).toLocaleString("id-ID")}
                                     </p>
                                 </div>
                             </div>

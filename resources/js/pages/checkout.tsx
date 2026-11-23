@@ -159,7 +159,7 @@ export default function Checkout({
                                     value={cashReceived || ""}
                                     onChange={(event) =>
                                         setCashReceived(
-                                            Number(event.target.value),
+                                            Number(event.target.value)
                                         )
                                     }
                                     placeholder="Masukkan nominal"

@@ -333,7 +333,7 @@ export default function SalesReport() {
                                         key={item}
                                         type="button"
                                         onClick={() => handlePeriodChange(item)}
-                                        className={`flex-1 rounded-lg px-2 py-2 text-xs font-bold transition sm:flex-none sm:px-3 ${
+                                        className={`flex-1 rounded-lg px-2 py-2 text-xs font-bold transition sm:flex-none sm:px-3 hover:cursor-pointer ${
                                             period === item
                                                 ? 'bg-[#f3904f] text-white shadow-sm'
                                                 : 'text-[#6f6c68] hover:text-[#3b4371]'
@@ -467,7 +467,7 @@ export default function SalesReport() {
                         <section className="min-w-0 rounded-2xl border border-[#eeeae7] bg-white p-4 sm:p-6">
                             <div className="flex items-center justify-between border-b border-[#f0eeec] pb-4">
                                 <h2 className="text-sm font-extrabold text-[#3b4371] sm:text-base">Porsi Kategori Terjual</h2>
-                                <span className="text-[#aaa6a2]">•••</span>
+                                {/* <span className="text-[#aaa6a2]">•••</span> */}
                             </div>
                             <div className="flex flex-col items-center gap-5 py-5">
                                 <div
